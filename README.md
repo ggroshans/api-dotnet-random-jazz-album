@@ -57,7 +57,7 @@ Current JSON for Album seeding
 | `story_behind_title`    | `VARCHAR`         | Explanation of the album title                               |
 | `album_position`        | `INTEGER`         | Album's position in the artist’s discography (e.g., 1st, 2nd) |
 | `popular_tracks`        | `VARCHAR[]`       | List of popular tracks                                       |
-| `awards`                | `VARCHAR[]`       | List of awards in "award (year)" format                     |
+| `awards`                | `VARCHAR[]`       | List of awards in "award (year)" format chronologically      |
 | `cover_art_description` | `VARCHAR`         | Brief description of the album cover’s design               |
 | `personal_anecdotes`    | `VARCHAR`         | Notes from the artist or producers                          |
 | `setlist_context`       | `VARCHAR`         | Context on how tracks fit into live setlists                |
