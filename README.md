@@ -34,4 +34,44 @@ Current JSON for Album seeding
   },
   "required": ["id", "title", "artist_name", "release_date", "genre", "cover_image_url", "total_tracks", "created_at", "updated_at"]
 }
+```
+
+| Column Name              | Data Type         | Description                                                  |
+|-------------------------|-------------------|--------------------------------------------------------------|
+| `id`                    | `INTEGER`         | Unique identifier for the album                              |
+| `title`                 | `VARCHAR`         | Album title                                                 |
+| `artist_name`           | `VARCHAR`         | Artist or band name (to be added later)                     |
+| `release_date`          | `DATE`            | Release date (YYYY-MM-DD)                                   |
+| `genre`                 | `VARCHAR`         | Main genre                                                  |
+| `sub_genres`           | `VARCHAR[]`       | List of subgenres                                           |
+| `cover_image_url`       | `VARCHAR`         | URL of the album cover image                                 |
+| `total_tracks`          | `INTEGER`         | Total number of tracks                                       |
+| `label`                 | `VARCHAR`         | Record label (optional)                                     |
+| `mood`                  | `VARCHAR[]`       | Overall mood(s) of the album                                 |
+| `featured_artists`      | `VARCHAR[]`       | List of featured artists                                     |
+| `recording_location`    | `VARCHAR`         | Location where album was recorded                            |
+| `length`                | `INTEGER`         | Total length of the album in minutes                        |
+| `release_notes`         | `VARCHAR`         | Notes from the artist (optional)                            |
+| `album_theme`           | `VARCHAR`         | Main theme or concept of the album                          |
+| `fan_rating`            | `DECIMAL`         | Average fan rating (e.g., 4.5)                             |
+| `story_behind_title`    | `VARCHAR`         | Explanation of the album title                               |
+| `album_position`        | `INTEGER`         | Album's position in the artist’s discography (e.g., 1st, 2nd) |
+| `popular_tracks`        | `VARCHAR[]`       | List of popular tracks                                       |
+| `awards`                | `VARCHAR[]`       | List of awards in "award (year)" format                     |
+| `cover_art_description` | `VARCHAR`         | Brief description of the album cover’s design               |
+| `personal_anecdotes`    | `VARCHAR`         | Notes from the artist or producers                          |
+| `setlist_context`       | `VARCHAR`         | Context on how tracks fit into live setlists                |
+| `created_at`            | `TIMESTAMP`       | Creation timestamp (ISO 8601)                               |
+| `updated_at`            | `TIMESTAMP`       | Last update timestamp (ISO 8601)                            |
+
+### Required Fields
+- `id`
+- `title`
+- `artist_name`
+- `release_date`
+- `genre`
+- `cover_image_url`
+- `total_tracks`
+- `created_at`
+- `updated_at`
 
