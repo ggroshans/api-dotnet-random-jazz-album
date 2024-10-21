@@ -8,11 +8,11 @@ namespace RandomAlbumAPI.Controllers
     [ApiController]
     public class AlbumsController : ControllerBase
     {
-
+        [HttpPost]
         public IActionResult CreateAlbum([FromBody] AlbumRequest albumRequest)
         {
             Console.WriteLine("FIRED");
-            return Ok();
+            return Ok("Worked");
         }
          
 
