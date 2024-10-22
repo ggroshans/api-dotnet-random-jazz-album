@@ -1,10 +1,23 @@
+using Serilog;
+
 namespace RandomAlbumAPI
 {
     public class Program
     {
         public static void Main(string[] args)
         {
+
             var builder = WebApplication.CreateBuilder(args);
+
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Debug()
+                .WriteTo.Console()
+                .CreateLogger();
+
+            builder.Host.UseSerilog();
+
+            Log.Logger.Information("Test");
 
             // Add services to the container.
 
