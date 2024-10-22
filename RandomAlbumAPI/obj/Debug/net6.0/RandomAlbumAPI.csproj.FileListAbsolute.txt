@@ -47,3 +47,7 @@ C:\Users\garth\projects\random-album-api\RandomAlbumAPI\bin\Debug\net6.0\Serilog
 C:\Users\garth\projects\random-album-api\RandomAlbumAPI\bin\Debug\net6.0\Serilog.Sinks.Console.dll
 C:\Users\garth\projects\random-album-api\RandomAlbumAPI\bin\Debug\net6.0\System.Diagnostics.DiagnosticSource.dll
 C:\Users\garth\projects\random-album-api\RandomAlbumAPI\bin\Debug\net6.0\Serilog.Sinks.Debug.dll
+C:\Users\garth\projects\random-album-api\RandomAlbumAPI\bin\Debug\net6.0\OpenAI.dll
+C:\Users\garth\projects\random-album-api\RandomAlbumAPI\bin\Debug\net6.0\System.ClientModel.dll
+C:\Users\garth\projects\random-album-api\RandomAlbumAPI\bin\Debug\net6.0\System.Memory.Data.dll
+C:\Users\garth\projects\random-album-api\RandomAlbumAPI\bin\Debug\net6.0\System.Text.Json.dll

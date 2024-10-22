@@ -1,3 +1,4 @@
+using RandomAlbumAPI.Services;
 using Serilog;
 
 namespace RandomAlbumAPI
@@ -35,6 +36,7 @@ namespace RandomAlbumAPI
                            .WithHeaders("Content-Type");
                 });
             });
+            builder.Services.AddScoped<OpenAIService>();
 
             var app = builder.Build();
 
