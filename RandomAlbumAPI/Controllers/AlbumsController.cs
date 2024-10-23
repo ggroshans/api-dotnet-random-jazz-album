@@ -11,9 +11,9 @@ namespace RandomAlbumAPI.Controllers
     {
         
         private readonly ILogger<AlbumsController> _logger;
-        public readonly OpenAIService _openAIservice;
+        public readonly GptApiService _openAIservice;
 
-        public AlbumsController(ILogger<AlbumsController> logger, OpenAIService openAIService)
+        public AlbumsController(ILogger<AlbumsController> logger, GptApiService openAIService)
         {
             _logger = logger;
             _openAIservice = openAIService;

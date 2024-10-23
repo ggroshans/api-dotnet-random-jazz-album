@@ -36,7 +36,7 @@ namespace RandomAlbumAPI
                            .WithHeaders("Content-Type");
                 });
             });
-            builder.Services.AddScoped<OpenAIService>();
+            builder.Services.AddScoped<GptApiService>();
 
             var app = builder.Build();
 

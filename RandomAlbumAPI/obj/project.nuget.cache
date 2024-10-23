@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "/Zj2bAkSeCI+634RRi5UOLvGFvVZZPkd5sMp0f7wIdGGJ2dAFUNtEXFg58rOT6vKKnz9zRIA2OrUMupKrgXTjQ==",
+  "dgSpecHash": "YLVXzOV2Y7tQ4rOxyj1Sd8EXuBSmJBeCKRK34WAut/VKdCv/QDnhGjZScTo4ITonp8/s0B31SAI9Cmx7sxorLg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\garth\\projects\\random-album-api\\RandomAlbumAPI\\RandomAlbumAPI.csproj",
+  "projectFilePath": "C:\\Users\\garth\\projects\\random-album-api\\RandomAlbumAPI\\RandomAlbumApi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\garth\\.nuget\\packages\\microsoft.aspnet.cors\\5.3.0\\microsoft.aspnet.cors.5.3.0.nupkg.sha512",
     "C:\\Users\\garth\\.nuget\\packages\\microsoft.extensions.apidescription.server\\6.0.5\\microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
