@@ -1,4 +1,5 @@
-using RandomAlbumAPI.Services;
+using RandomAlbumApi.Services.ApiServices;
+using RandomAlbumApi.Services.AuthServices.Spotify;
 using Serilog;
 
 namespace RandomAlbumAPI
@@ -37,6 +38,8 @@ namespace RandomAlbumAPI
                 });
             });
             builder.Services.AddScoped<GptApiService>();
+            builder.Services.AddScoped<SpotifyService>();
+            builder.Services.AddScoped<ISpotifyClient, SpotifyClient>();
 
             var app = builder.Build();
 

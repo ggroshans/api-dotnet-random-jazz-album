@@ -1,14 +1,14 @@
 ﻿using OpenAI.Chat;
 using System.Text;
 
-namespace RandomAlbumAPI.Services
+namespace RandomAlbumApi.Services.ApiServices
 {
-    public class OpenAIService
+    public class GptApiService
     {
         private readonly string _apiKey;
         private readonly ChatClient _client;
 
-        public OpenAIService (IConfiguration configuration)
+        public GptApiService(IConfiguration configuration)
         {
             _apiKey = configuration["openai"];
             _client = new(model: "gpt-4o", apiKey: _apiKey);
@@ -19,7 +19,7 @@ namespace RandomAlbumAPI.Services
             string schema = @"{
               ""title"": { ""type"": ""string"" }, // album title
               ""artist_name"": { ""type"": ""string"" }, // musician's name
-              ""release_date"": { ""type"": ""string"", ""format"": ""date"" }, // album release date (MM/DD/YYYY)
+              ""release_year"": { ""type"": ""int"" }, // album release year 
               ""genre"": { ""type"": ""string"" }, // primary music genre (e.g., rock, jazz)
               ""sub_genres"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } }, // list of subgenres
               ""cover_image_url"": { ""type"": ""string"", ""format"": ""uri"" }, // URL of the album cover image
@@ -46,8 +46,8 @@ namespace RandomAlbumAPI.Services
             prompt.AppendLine(schema);
 
             var chatCompletion = await _client.CompleteChatAsync(prompt.ToString());
-           
+
             return chatCompletion;
-        } 
+        }
     }
 }
