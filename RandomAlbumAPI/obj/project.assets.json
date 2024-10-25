@@ -1596,11 +1596,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\garth\\projects\\random-album-api\\RandomAlbumApi\\RandomAlbumApi.csproj",
+      "projectUniqueName": "C:\\Users\\garth\\projects\\random-album-api\\RandomAlbumAPI\\RandomAlbumApi.csproj",
       "projectName": "RandomAlbumApi",
-      "projectPath": "C:\\Users\\garth\\projects\\random-album-api\\RandomAlbumApi\\RandomAlbumApi.csproj",
+      "projectPath": "C:\\Users\\garth\\projects\\random-album-api\\RandomAlbumAPI\\RandomAlbumApi.csproj",
       "packagesPath": "C:\\Users\\garth\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\garth\\projects\\random-album-api\\RandomAlbumApi\\obj\\",
+      "outputPath": "C:\\Users\\garth\\projects\\random-album-api\\RandomAlbumAPI\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
