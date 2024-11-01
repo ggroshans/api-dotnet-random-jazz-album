@@ -8,16 +8,16 @@ namespace RandomAlbumAPI
     {
         public static void Main(string[] args)
         {
-
-            var builder = WebApplication.CreateBuilder(args);
-
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.Debug()
                 .WriteTo.Console()
                 .CreateLogger();
 
+            var builder = WebApplication.CreateBuilder(args);
+
             builder.Host.UseSerilog();
+            builder.Services.AddSingleton(Log.Logger);
 
             Log.Logger.Information("Test");
 
@@ -37,10 +37,11 @@ namespace RandomAlbumAPI
                            .WithHeaders("Content-Type");
                 });
             });
-            builder.Services.AddScoped<GptApiService>();
-            builder.Services.AddScoped<SpotifyService>();
-            builder.Services.AddScoped<ISpotifyClient, SpotifyClient>();
 
+            builder.Services.AddScoped<GptApiService>();
+            builder.Services.AddScoped<SpotifyApiService>();
+            builder.Services.AddScoped<ISpotifyClient, SpotifyClient>();
+  
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
