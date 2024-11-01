@@ -1,4 +1,7 @@
-﻿using OpenAI.Chat;
+﻿using Newtonsoft.Json;
+using OpenAI.Chat;
+using RandomAlbumApi.Models;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace RandomAlbumApi.Services.ApiServices
@@ -48,6 +51,62 @@ namespace RandomAlbumApi.Services.ApiServices
             var chatCompletion = await _client.CompleteChatAsync(prompt.ToString());
 
             return chatCompletion;
+        }
+
+        public async Task<List<AlbumDto>> PopulateAlbumDetails(List<AlbumDto> albums, string artistName)
+        {
+            var populatedAlbums = new List<AlbumDto>();
+            string schema = @"
+        {
+            ""description"": { ""type"": ""string"" }, // album description or release notes (~500 characters)
+            ""genre"": { ""type"": ""string"" }, // primary music genre (e.g., rock, jazz)
+            ""subgenres"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } }, // list of subgenres
+            ""moods"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } }, // list of moods that describe the album
+            ""album_position"": { ""type"": ""integer"" }, // position of the album in the artist's discography (e.g., 1st, 5th)
+            ""popular_tracks"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } }, // list of the most popular tracks from the album
+            ""album_theme"": { ""type"": ""string"" } // main theme or concept of the album
+        }";
+
+            foreach (var album in albums)
+            {
+                var prompt = new StringBuilder();
+                prompt.AppendLine($"" +
+                    $"For the album: {album.Name} by {artistName}, return a json object using this schema,  " +
+                    $"formatted in a single line without line breaks or extra spaces," +
+                    $"and without any code block formatting or additional text:");
+                prompt.AppendLine(schema);
+
+                var chatCompletion = await _client.CompleteChatAsync(prompt.ToString());
+                var responseContent = chatCompletion?.Value.Content[0].Text;
+  
+                if (!string.IsNullOrEmpty(responseContent))
+                {
+                    try
+                    {
+
+                    var albumDetails = JsonConvert.DeserializeObject<AlbumDto>(responseContent);
+
+                        if (albumDetails != null)
+                        {
+                            album.Description = albumDetails.Description;
+                            album.Genre = albumDetails.Genre;
+                            album.Subgenres = albumDetails.Subgenres.ToList();
+                            album.Moods = albumDetails.Moods.ToList();
+                            album.AlbumPosition = albumDetails.AlbumPosition;
+                            album.PopularTracks = albumDetails.PopularTracks;
+                            album.AlbumTheme = albumDetails.AlbumTheme;
+                            
+                            populatedAlbums.Add(album);
+                        }
+                    }
+                   
+                    catch(Exception ex)
+                    {
+                        Console.WriteLine($"JSON Parsing Error for album {album.Name}: {ex.Message}");
+                    }
+                }
+            }
+            return populatedAlbums;
         }
     }
 }
