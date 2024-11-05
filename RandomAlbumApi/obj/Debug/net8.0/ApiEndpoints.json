@@ -1,0 +1,34 @@
+[
+  {
+    "ContainingType": "RandomAlbumAPI.Controllers.AlbumsController",
+    "Method": "CreateAlbum",
+    "RelativePath": "api/Album/gpt",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "albumRequest",
+        "Type": "RandomAlbumAPI.Models.AlbumRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "RandomAlbumAPI.Controllers.AlbumsController",
+    "Method": "CreateAlbumsFromArtist",
+    "RelativePath": "api/Album/spotify",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "albumRequest",
+        "Type": "RandomAlbumAPI.Models.AlbumRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]
