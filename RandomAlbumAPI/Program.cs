@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using RandomAlbumApi.Data;
 using RandomAlbumApi.Services.ApiServices;
 using RandomAlbumApi.Services.AuthServices.Spotify;
 using Serilog;
@@ -23,6 +25,8 @@ namespace RandomAlbumAPI
 
             // Add services to the container.
 
+            builder.Services.AddDbContext<MusicDbContext>(options =>
+                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
