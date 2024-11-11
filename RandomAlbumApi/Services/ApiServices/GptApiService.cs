@@ -62,7 +62,6 @@ namespace RandomAlbumApi.Services.ApiServices
             ""genre"": { ""type"": ""string"" }, // primary music genre (e.g., rock, jazz)
             ""subgenres"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } }, // list of subgenres
             ""moods"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } }, // list of moods that describe the album
-            ""album_position"": { ""type"": ""integer"" }, // position of the album in the artist's discography (e.g., 1st, 5th)
             ""popular_tracks"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } }, // list of the most popular tracks from the album
             ""album_theme"": { ""type"": ""string"" } // main theme or concept of the album
         }";
@@ -92,7 +91,6 @@ namespace RandomAlbumApi.Services.ApiServices
                             album.Genre = albumDetails.Genre;
                             album.Subgenres = albumDetails.Subgenres.ToList();
                             album.Moods = albumDetails.Moods.ToList();
-                            album.AlbumPosition = albumDetails.AlbumPosition;
                             album.PopularTracks = albumDetails.PopularTracks;
                             album.AlbumTheme = albumDetails.AlbumTheme;
                             
