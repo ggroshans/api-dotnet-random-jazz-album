@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RandomAlbumApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0fc6b95ac00b39a26af01ae6e6487ce943b69c1f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ec374faf7b0987c3d309675d355ad4b353398fff")]
 [assembly: System.Reflection.AssemblyProductAttribute("RandomAlbumApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RandomAlbumApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

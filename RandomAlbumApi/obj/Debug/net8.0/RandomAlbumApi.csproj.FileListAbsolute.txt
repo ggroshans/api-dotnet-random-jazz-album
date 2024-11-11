@@ -42,3 +42,11 @@ C:\Users\garth\projects\random-album-api\RandomAlbumAPI\obj\Debug\net8.0\refint\
 C:\Users\garth\projects\random-album-api\RandomAlbumAPI\obj\Debug\net8.0\RandomAlbumApi.pdb
 C:\Users\garth\projects\random-album-api\RandomAlbumAPI\obj\Debug\net8.0\RandomAlbumApi.genruntimeconfig.cache
 C:\Users\garth\projects\random-album-api\RandomAlbumAPI\obj\Debug\net8.0\ref\RandomAlbumApi.dll
+C:\Users\garth\projects\random-album-api\RandomAlbumAPI\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.dll
+C:\Users\garth\projects\random-album-api\RandomAlbumAPI\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+C:\Users\garth\projects\random-album-api\RandomAlbumAPI\bin\Debug\net8.0\Microsoft.Extensions.Caching.Memory.dll
+C:\Users\garth\projects\random-album-api\RandomAlbumAPI\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.dll
+C:\Users\garth\projects\random-album-api\RandomAlbumAPI\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\garth\projects\random-album-api\RandomAlbumAPI\bin\Debug\net8.0\Microsoft.Extensions.Logging.dll
+C:\Users\garth\projects\random-album-api\RandomAlbumAPI\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\garth\projects\random-album-api\RandomAlbumAPI\bin\Debug\net8.0\Microsoft.Extensions.Options.dll

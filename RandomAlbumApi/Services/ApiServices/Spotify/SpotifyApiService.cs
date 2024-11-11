@@ -9,6 +9,7 @@ using RandomAlbumApi.Services.AuthServices.Spotify;
 using Microsoft.AspNetCore.Authentication;
 using Newtonsoft.Json;
 using System.Text;
+using RandomAlbumApi.Services.ApiServices.Spotify;
 
 public class SpotifyApiService
 {
