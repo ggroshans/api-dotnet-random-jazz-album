@@ -1,15 +1,15 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\garth\\projects\\random-album-api\\RandomAlbumAPI\\RandomAlbumApi.csproj": {}
+    "C:\\Users\\garth\\projects\\random-album-api\\RandomAlbumApi\\RandomAlbumApi.csproj": {}
   },
   "projects": {
-    "C:\\Users\\garth\\projects\\random-album-api\\RandomAlbumAPI\\RandomAlbumApi.csproj": {
+    "C:\\Users\\garth\\projects\\random-album-api\\RandomAlbumApi\\RandomAlbumApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\garth\\projects\\random-album-api\\RandomAlbumAPI\\RandomAlbumApi.csproj",
+        "projectUniqueName": "C:\\Users\\garth\\projects\\random-album-api\\RandomAlbumApi\\RandomAlbumApi.csproj",
         "projectName": "RandomAlbumApi",
-        "projectPath": "C:\\Users\\garth\\projects\\random-album-api\\RandomAlbumAPI\\RandomAlbumApi.csproj",
+        "projectPath": "C:\\Users\\garth\\projects\\random-album-api\\RandomAlbumApi\\RandomAlbumApi.csproj",
         "packagesPath": "C:\\Users\\garth\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\garth\\projects\\random-album-api\\RandomAlbumAPI\\obj\\",
         "projectStyle": "PackageReference",
@@ -56,13 +56,13 @@
             },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[8.0.10, )"
+              "version": "[8.0.11, )"
             },
             "Microsoft.EntityFrameworkCore.Tools": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[8.0.10, )"
+              "version": "[8.0.11, )"
             },
             "Newtonsoft.Json": {
               "target": "Package",
