@@ -16,7 +16,7 @@ namespace RandomAlbumApi.Models
 
         //gpt fields
         public string? Description { get; set; }
-        public Genre? Genre { get; set; }
+        public List<AlbumGenre> AlbumGenres { get; set; } = new List<AlbumGenre>();
         public List<AlbumSubgenre>? AlbumSubgenres { get; set; } = new List<AlbumSubgenre>();
         public List<AlbumMood>? AlbumMoods { get; set; } = new List<AlbumMood>();
         public List<string>? PopularTracks { get; set; }
@@ -37,6 +37,7 @@ namespace RandomAlbumApi.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public List<Subgenre> Subgenres { get; set; } = new List<Subgenre>();
+        public List<AlbumGenre> AlbumGenres { get; set; } = new List<AlbumGenre>();
     }
 
     public class Subgenre
@@ -63,6 +64,14 @@ namespace RandomAlbumApi.Models
         public int ArtistId { get; set; }
         public Artist Artist { get; set; }
 
+    }
+
+    public class AlbumGenre
+    {
+        public int AlbumId { get; set; }
+        public Album Album { get; set; }
+        public int GenreId { get; set; }
+        public Genre Genre { get; set; }
     }
 
     public class AlbumSubgenre

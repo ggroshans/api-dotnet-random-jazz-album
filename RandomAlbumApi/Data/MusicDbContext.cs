@@ -17,11 +17,11 @@ namespace RandomAlbumApi.Data
         public DbSet<AlbumSubgenre> AlbumSubgenres { get; set; }
         public DbSet<AlbumMood> AlbumMoods { get; set; }
 
-    public MusicDbContext (DbContextOptions<MusicDbContext> options)
+    public MusicDbContext (DbContextOptions<MusicDbContext> options) : base(options)
     {
     }    
 
-    protected void OnModelingCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
             // Album + Artist (many to many)
             modelBuilder.Entity<AlbumArtist>()
@@ -36,6 +36,20 @@ namespace RandomAlbumApi.Data
                 .HasOne(aa => aa.Artist)
                 .WithMany(a => a.AlbumArtists)
                 .HasForeignKey(aa => aa.ArtistId);
+
+            // Album + Genre (many to many)
+            modelBuilder.Entity<AlbumGenre>()
+                .HasKey(ag => new { ag.AlbumId, ag.GenreId });
+
+            modelBuilder.Entity<AlbumGenre>()
+                .HasOne(ag => ag.Album)
+                .WithMany(ag => ag.AlbumGenres)
+                .HasForeignKey(ag => ag.AlbumId);
+
+            modelBuilder.Entity<AlbumGenre>()
+                .HasOne(ag => ag.Genre)
+                .WithMany(ag => ag.AlbumGenres)
+                .HasForeignKey(ag => ag.GenreId);
 
             // Album + Subgenre (many to many)
 
@@ -74,6 +88,5 @@ namespace RandomAlbumApi.Data
                 .WithMany(g => g.Subgenres)
                 .HasForeignKey(s => s.GenreId);
         }
-
     }    
 }
