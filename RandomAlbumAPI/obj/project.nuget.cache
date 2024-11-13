@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Y4hMOlKwD7A=",
+  "dgSpecHash": "4wmXMxehK2w=",
   "success": true,
-  "projectFilePath": "C:\\Users\\garth\\projects\\random-album-api\\RandomAlbumApi\\RandomAlbumApi.csproj",
+  "projectFilePath": "C:\\Users\\garth\\projects\\random-album-api\\RandomAlbumAPI\\RandomAlbumApi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\garth\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\garth\\.nuget\\packages\\microsoft.aspnet.cors\\5.3.0\\microsoft.aspnet.cors.5.3.0.nupkg.sha512",
