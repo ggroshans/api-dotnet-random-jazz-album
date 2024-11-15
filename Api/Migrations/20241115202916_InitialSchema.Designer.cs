@@ -9,11 +9,11 @@ using RandomAlbumApi.Data;
 
 #nullable disable
 
-namespace RandomAlbumApi.Migrations
+namespace Api.Migrations
 {
     [DbContext(typeof(MusicDbContext))]
-    [Migration("20241113012958_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20241115202916_InitialSchema")]
+    partial class InitialSchema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -93,7 +93,7 @@ namespace RandomAlbumApi.Migrations
 
                     b.HasIndex("GenreId");
 
-                    b.ToTable("AlbumGenre");
+                    b.ToTable("AlbumGenres");
                 });
 
             modelBuilder.Entity("RandomAlbumApi.Models.AlbumMood", b =>

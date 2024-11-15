@@ -87,7 +87,9 @@ public class SpotifyApiService
 
         foreach (var album in albums)
         {
-            if (album.AlbumType == "album" && album.Artists.Any(x => x.Name == artistName))
+            if (album.AlbumType == "album" 
+                && album.Artists.Any(x => x.Name.ToLower() == artistName.ToLower()) 
+                && !filteredAlbums.Any(x => x.Name.Equals(album.Name, StringComparison.OrdinalIgnoreCase)))
             {
                 var image = album.Images.Where(image => image.Height == 640 && image.Width == 640).Select(image => image.Url).FirstOrDefault();
                 List<ArtistDto> artists = album.Artists.Select(spotifyArtist => new ArtistDto

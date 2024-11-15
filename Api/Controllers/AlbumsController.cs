@@ -3,6 +3,8 @@ using RandomAlbumApi.Services.ApiServices;
 using RandomAlbumApi.Services.AuthServices.Spotify;
 using RandomAlbumApi.Models;
 using Serilog;
+using RandomAlbumApi.Data;
+using Api.Services;
 
 namespace RandomAlbumApi.Controllers
 {
@@ -15,13 +17,16 @@ namespace RandomAlbumApi.Controllers
         private readonly Serilog.ILogger _logger;
         private readonly SpotifyApiService _spotifyApiService;
         public readonly GptApiService _openAIservice;
+        private readonly PopulateDbService _populateDbService;
 
 
-        public AlbumsController( Serilog.ILogger logger, GptApiService openAIService, SpotifyApiService spotifyApiService)
+
+        public AlbumsController( Serilog.ILogger logger, GptApiService openAIService, SpotifyApiService spotifyApiService, PopulateDbService populateDbService)
         {
             _logger = logger;
             _openAIservice = openAIService;
             _spotifyApiService = spotifyApiService;
+            _populateDbService = populateDbService;
         }
 
         [HttpPost("gpt")]
@@ -39,6 +44,7 @@ namespace RandomAlbumApi.Controllers
             var token = await _spotifyApiService.GetToken();
             var spotifyAlbums = await _spotifyApiService.GetAllAlbums(albumRequest.ArtistName, token);
             var populatedAlbums = await _openAIservice.PopulateAlbumDetails(spotifyAlbums, albumRequest.ArtistName);
+            await _populateDbService.SeedAlbumAsync(populatedAlbums);
             return Ok(populatedAlbums);
         }
     }

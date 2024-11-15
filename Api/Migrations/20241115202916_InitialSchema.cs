@@ -4,10 +4,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace RandomAlbumApi.Migrations
+namespace Api.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialSchema : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -98,7 +98,7 @@ namespace RandomAlbumApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AlbumGenre",
+                name: "AlbumGenres",
                 columns: table => new
                 {
                     AlbumId = table.Column<int>(type: "integer", nullable: false),
@@ -106,15 +106,15 @@ namespace RandomAlbumApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AlbumGenre", x => new { x.AlbumId, x.GenreId });
+                    table.PrimaryKey("PK_AlbumGenres", x => new { x.AlbumId, x.GenreId });
                     table.ForeignKey(
-                        name: "FK_AlbumGenre_Albums_AlbumId",
+                        name: "FK_AlbumGenres_Albums_AlbumId",
                         column: x => x.AlbumId,
                         principalTable: "Albums",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_AlbumGenre_Genres_GenreId",
+                        name: "FK_AlbumGenres_Genres_GenreId",
                         column: x => x.GenreId,
                         principalTable: "Genres",
                         principalColumn: "Id",
@@ -195,8 +195,8 @@ namespace RandomAlbumApi.Migrations
                 column: "ArtistId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AlbumGenre_GenreId",
-                table: "AlbumGenre",
+                name: "IX_AlbumGenres_GenreId",
+                table: "AlbumGenres",
                 column: "GenreId");
 
             migrationBuilder.CreateIndex(
@@ -222,7 +222,7 @@ namespace RandomAlbumApi.Migrations
                 name: "AlbumArtists");
 
             migrationBuilder.DropTable(
-                name: "AlbumGenre");
+                name: "AlbumGenres");
 
             migrationBuilder.DropTable(
                 name: "AlbumMoods");

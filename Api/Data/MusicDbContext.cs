@@ -14,6 +14,7 @@ namespace RandomAlbumApi.Data
 
         // Junction tables for many-to-many
         public DbSet<AlbumArtist> AlbumArtists { get; set; }
+        public DbSet<AlbumGenre> AlbumGenres { get; set; }
         public DbSet<AlbumSubgenre> AlbumSubgenres { get; set; }
         public DbSet<AlbumMood> AlbumMoods { get; set; }
 

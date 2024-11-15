@@ -1,3 +1,4 @@
+using Api.Services;
 using Microsoft.EntityFrameworkCore;
 using RandomAlbumApi.Data;
 using RandomAlbumApi.Services.ApiServices;
@@ -45,6 +46,7 @@ namespace RandomAlbumApi
             builder.Services.AddScoped<GptApiService>();
             builder.Services.AddScoped<SpotifyApiService>();
             builder.Services.AddScoped<ISpotifyClient, SpotifyClient>();
+            builder.Services.AddScoped<PopulateDbService>();
   
             var app = builder.Build();
 
