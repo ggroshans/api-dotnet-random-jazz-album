@@ -4,7 +4,7 @@ using RandomAlbumApi.Services.ApiServices;
 using RandomAlbumApi.Services.AuthServices.Spotify;
 using Serilog;
 
-namespace RandomAlbumAPI
+namespace RandomAlbumApi
 {
     public class Program
     {

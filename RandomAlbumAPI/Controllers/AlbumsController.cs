@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RandomAlbumApi.Services.ApiServices;
 using RandomAlbumApi.Services.AuthServices.Spotify;
-using RandomAlbumAPI.Models;
+using RandomAlbumApi.Models;
 using Serilog;
 
-namespace RandomAlbumAPI.Controllers
+namespace RandomAlbumApi.Controllers
 {
 
     [Route("api/Album")]
