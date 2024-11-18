@@ -8,7 +8,7 @@ namespace RandomAlbumApi.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public List<ArtistDto> Artists { get; set; }
-        public string ReleaseDate { get; set; }
+        public string ReleaseYear { get; set; }
         public int TotalTracks { get; set; }
         public string ImageUrl { get; set; }
         public string SpotifyId { get; set; }

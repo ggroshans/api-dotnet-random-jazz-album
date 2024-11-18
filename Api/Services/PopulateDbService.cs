@@ -21,7 +21,7 @@ namespace Api.Services
                 var album = new Album
                 {
                     Name = albumDto.Name,
-                    ReleaseDate = albumDto.ReleaseDate,
+                    ReleaseYear = albumDto.ReleaseYear,
                     TotalTracks = albumDto.TotalTracks,
                     ImageUrl = albumDto.ImageUrl,
                     SpotifyId = albumDto.SpotifyId,

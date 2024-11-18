@@ -104,7 +104,7 @@ public class SpotifyApiService
                 {
                     Name = album.Name,
                     Artists = artists,
-                    ReleaseDate = album.ReleaseDate,
+                    ReleaseYear = album.ReleaseDate.Substring(0,4),
                     TotalTracks = album.TotalTracks,
                     ImageUrl = image,
                     SpotifyId = album.Id,
