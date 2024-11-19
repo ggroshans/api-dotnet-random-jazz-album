@@ -24,6 +24,18 @@ namespace RandomAlbumApi.Data
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+            // mapping table names to lowercase
+            modelBuilder.Entity<Album>().ToTable("albums");
+            modelBuilder.Entity<Artist>().ToTable("artists");
+            modelBuilder.Entity<Genre>().ToTable("genres");
+            modelBuilder.Entity<Subgenre>().ToTable("subgenres");
+            modelBuilder.Entity<Mood>().ToTable("moods");
+
+            modelBuilder.Entity<AlbumArtist>().ToTable("album_artists");
+            modelBuilder.Entity<AlbumGenre>().ToTable("album_genres");
+            modelBuilder.Entity<AlbumSubgenre>().ToTable("album_subgenres");
+            modelBuilder.Entity<AlbumMood>().ToTable("album_moods");
+
             // Album + Artist (many to many)
             modelBuilder.Entity<AlbumArtist>()
                 .HasKey(aa => new { aa.AlbumId, aa.ArtistId });
@@ -53,7 +65,6 @@ namespace RandomAlbumApi.Data
                 .HasForeignKey(ag => ag.GenreId);
 
             // Album + Subgenre (many to many)
-
             modelBuilder.Entity<AlbumSubgenre>()
                 .HasKey(aa => new { aa.AlbumId, aa.SubgenreId });
 
@@ -68,7 +79,6 @@ namespace RandomAlbumApi.Data
                 .HasForeignKey(asg => asg.SubgenreId);
 
             // Album + Mood (many to many)
-
             modelBuilder.Entity<AlbumMood>()
                 .HasKey(am => new { am.AlbumId, am.MoodId });
 
@@ -83,7 +93,6 @@ namespace RandomAlbumApi.Data
                 .HasForeignKey(am => am.MoodId);
 
             // Genre + Subgenre (one to many)
-
             modelBuilder.Entity<Subgenre>()
                 .HasOne(s => s.Genre)
                 .WithMany(g => g.Subgenres)
