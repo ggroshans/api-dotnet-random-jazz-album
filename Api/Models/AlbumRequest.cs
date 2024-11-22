@@ -1,4 +1,4 @@
-﻿namespace RandomAlbumApi.Models
+﻿namespace Api.Models
 {
     public class AlbumRequest
     {

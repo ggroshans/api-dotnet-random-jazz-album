@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace RandomAlbumApi.Models
+namespace Api.Models
 {
     public class AlbumDto
     {
@@ -26,9 +26,15 @@ namespace RandomAlbumApi.Models
 
     public class ArtistDto
     {
+        //spotify fields
         public int Id { get; set; } 
         public string Name { get; set; }
-        public string Type { get; set; }
+        public List<string>? Genres { get; set; }
+        public string ImageUrl { get; set; }
+        public int PopularityScore { get; set; }
         public string SpotifyId { get; set; }
+
+        //gpt fields
+        public string Biography { get; set; }
     }
 }

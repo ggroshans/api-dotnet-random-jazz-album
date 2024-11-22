@@ -1,14 +1,13 @@
 ﻿using Newtonsoft.Json;
-using System.Text.Json.Serialization;
 
-namespace RandomAlbumApi.Services.ApiServices.Spotify
+namespace Api.Services.ApiServices.Spotify
 {
-    public class SpotifyApiResponse
+    public class SpotifyAlbumsApiResponse
     {
-        public SpotifyResponseData Albums { get; set; }
+        public SpotifyAlbumsResponseData Albums { get; set; }
     }
 
-    public class SpotifyResponseData
+    public class SpotifyAlbumsResponseData
     {
         public string Href { get; set; }
         public List<SpotifyAlbum> Items { get; set; }
@@ -46,8 +45,7 @@ namespace RandomAlbumApi.Services.ApiServices.Spotify
     {
         public string Id { get; set; }
         public string Name { get; set; }
-        public string Type { get; set; }
-    }
+   }
 
     public class SpotifyImage
     {
@@ -55,5 +53,22 @@ namespace RandomAlbumApi.Services.ApiServices.Spotify
         public int Width { get; set; }
         public string Url { get; set; }
 
+    }
+
+    public class SpotifyArtistApiResponse
+    {
+
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
+        [JsonProperty("genres")]
+        public List<string> Genres { get; set; }
+
+        [JsonProperty("images")]
+        public List<SpotifyImage> Images { get; set; }
+
+        [JsonProperty("popularity")]
+        public int PopularityScore { get; set; }
+        
     }
 }

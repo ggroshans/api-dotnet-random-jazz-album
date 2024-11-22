@@ -1,8 +1,9 @@
 using Api.Services;
 using Microsoft.EntityFrameworkCore;
-using RandomAlbumApi.Data;
-using RandomAlbumApi.Services.ApiServices;
-using RandomAlbumApi.Services.AuthServices.Spotify;
+using Api.Data;
+using Api.Services.ApiServices;
+using Api.Services.ApiServices.Spotify;
+using Api.Services.AuthServices.Spotify;
 using Serilog;
 
 namespace RandomAlbumApi

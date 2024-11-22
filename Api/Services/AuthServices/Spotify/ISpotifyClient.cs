@@ -1,4 +1,4 @@
-﻿namespace RandomAlbumApi.Services.AuthServices.Spotify
+﻿namespace Api.Services.AuthServices.Spotify
 {
     public interface ISpotifyClient
     {

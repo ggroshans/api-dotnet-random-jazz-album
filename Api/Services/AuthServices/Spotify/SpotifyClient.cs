@@ -1,7 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using Newtonsoft.Json;
 
-namespace RandomAlbumApi.Services.AuthServices.Spotify
+namespace Api.Services.AuthServices.Spotify
 {
     public class SpotifyClient : ISpotifyClient
     {

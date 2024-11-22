@@ -1,19 +1,25 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RandomAlbumApi.Data;
-using RandomAlbumApi.Models;
+using Api.Data;
+using Api.Models;
+using Api.Services.ApiServices;
+using Api.Services.ApiServices.Spotify;
 
 namespace Api.Services
 {
     public class PopulateDbService
     {
         private readonly MusicDbContext _db;
+        private readonly SpotifyApiService _spotifyApiService;
+        private readonly GptApiService _gptApiService;
 
-        public PopulateDbService(MusicDbContext db)
+        public PopulateDbService(MusicDbContext db, SpotifyApiService spotifyApiService, GptApiService gptApiService)
         {
             _db = db;
+            _spotifyApiService = spotifyApiService;
+            _gptApiService = gptApiService;
         }
 
-        public async Task SeedAlbumAsync(List<AlbumDto> albumDtos)
+        public async Task PopulateAlbumAsync(List<AlbumDto> albumDtos)
         {
             foreach (var albumDto in albumDtos)
             {
@@ -39,10 +45,14 @@ namespace Api.Services
 
                     if (existingArtist == null)
                     {
+                        var populatedArtist = await GetArtistDetailsAsync(artistDto);
                         existingArtist = new Artist
                         {
                             Name = artistDto.Name,
-                            Type = artistDto.Type,
+                            Biography = populatedArtist.Biography,
+                            Genres = populatedArtist.Genres,
+                            ImageUrl = populatedArtist.ImageUrl,
+                            PopularityScore = populatedArtist.PopularityScore,
                             SpotifyId = artistDto.SpotifyId
                         };
                         _db.Artists.Add(existingArtist);
@@ -134,6 +144,13 @@ namespace Api.Services
                 }
             }
             await _db.SaveChangesAsync();
+        }
+
+        public async Task<ArtistDto> GetArtistDetailsAsync(ArtistDto artist)
+        {
+            var spotifyArtist = await _spotifyApiService.GetSpotifyArtist(artist);
+            var gptArtist = await _gptApiService.GetGptArtistDetails(spotifyArtist);
+            return gptArtist;
         }
     }
 }

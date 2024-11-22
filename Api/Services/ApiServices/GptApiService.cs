@@ -1,10 +1,9 @@
 ﻿using Newtonsoft.Json;
 using OpenAI.Chat;
-using RandomAlbumApi.Models;
-using System.Runtime.InteropServices;
+using Api.Models;
 using System.Text;
 
-namespace RandomAlbumApi.Services.ApiServices
+namespace Api.Services.ApiServices
 {
     public class GptApiService
     {
@@ -53,7 +52,7 @@ namespace RandomAlbumApi.Services.ApiServices
             return chatCompletion;
         }
 
-        public async Task<List<AlbumDto>> PopulateAlbumDetails(List<AlbumDto> albums, string artistName)
+        public async Task<List<AlbumDto>> GetGptAlbumDetails(List<AlbumDto> albums, string artistName)
         {
             var populatedAlbums = new List<AlbumDto>();
             string schema = @"
@@ -105,6 +104,45 @@ namespace RandomAlbumApi.Services.ApiServices
                 }
             }
             return populatedAlbums;
+        }
+
+        public async Task<ArtistDto> GetGptArtistDetails(ArtistDto artist)
+        {
+            string schema = @"
+        {
+            ""biography"": { ""type"": ""string"" }, // artist/musician description or release notes (~500 characters)
+        }";
+
+                var prompt = new StringBuilder();
+                prompt.AppendLine($"" +
+                    $"For the artist/musician: {artist.Name}, return a json object using this schema,  " +
+                    $"formatted in a single line without line breaks or extra spaces," +
+                    $"and without any code block formatting or additional text:");
+                prompt.AppendLine(schema);
+
+                var chatCompletion = await _client.CompleteChatAsync(prompt.ToString());
+                var responseContent = chatCompletion?.Value.Content[0].Text;
+
+                if (!string.IsNullOrEmpty(responseContent))
+                {
+                    try
+                    {
+
+                        var artistDetails = JsonConvert.DeserializeObject<ArtistDto>(responseContent);
+
+                        if (artistDetails != null)
+                        {
+                            artist.Biography = artistDetails.Biography;
+                        }
+                    }
+
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"JSON Parsing Error for artist {artist.Name}: {ex.Message}");
+                    }
+                
+            }
+            return artist;
         }
     }
 }

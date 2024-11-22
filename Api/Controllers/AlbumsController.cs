@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RandomAlbumApi.Services.ApiServices;
-using RandomAlbumApi.Services.AuthServices.Spotify;
-using RandomAlbumApi.Models;
-using Serilog;
-using RandomAlbumApi.Data;
+using Api.Services.ApiServices;
+using Api.Models;
 using Api.Services;
+using Api.Services.ApiServices.Spotify;
 
-namespace RandomAlbumApi.Controllers
+namespace Api.Controllers
 {
 
     [Route("api/Album")]
@@ -41,11 +39,10 @@ namespace RandomAlbumApi.Controllers
         [HttpPost("spotify")]
         public async Task<IActionResult> CreateAlbumsFromArtist([FromBody] AlbumRequest albumRequest)
         {
-            var token = await _spotifyApiService.GetToken();
-            var spotifyAlbums = await _spotifyApiService.GetAllAlbums(albumRequest.ArtistName, token);
-            var populatedAlbums = await _openAIservice.PopulateAlbumDetails(spotifyAlbums, albumRequest.ArtistName);
-            await _populateDbService.SeedAlbumAsync(populatedAlbums);
-            return Ok(populatedAlbums);
+            var spotifyAlbums = await _spotifyApiService.GetSpotifyAlbums(albumRequest.ArtistName);
+            var gptAlbums = await _openAIservice.GetGptAlbumDetails(spotifyAlbums, albumRequest.ArtistName);
+            await _populateDbService.PopulateAlbumAsync(gptAlbums);
+            return Ok(gptAlbums);
         }
     }
 }

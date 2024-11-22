@@ -1,117 +1,140 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Http.Headers;
-using System.Text.Json;
-using System.Threading.Tasks;
-using System.Threading;
-using RandomAlbumApi.Models;
-using RandomAlbumApi.Services.AuthServices.Spotify;
-using Microsoft.AspNetCore.Authentication;
+using Api.Models;
+using Api.Services.AuthServices.Spotify;
 using Newtonsoft.Json;
-using System.Text;
-using RandomAlbumApi.Services.ApiServices.Spotify;
 
-public class SpotifyApiService
-{
-
-    private readonly ISpotifyClient _client;
-    private readonly IConfiguration _configuration;
-    private readonly Serilog.ILogger _logger;
-    
-    private readonly string _spotifyClientId;
-    private readonly string _spotifyClientSecret;
-
-    private const string _baseUrl = "https://api.spotify.com/v1/search";
-
-    public SpotifyApiService(ISpotifyClient client, IConfiguration configuration, Serilog.ILogger logger)
+namespace Api.Services.ApiServices.Spotify
+{ 
+    public class SpotifyApiService
     {
-        _client = client;
-        _configuration = configuration;
-        _logger = logger;
 
-        _spotifyClientId = _configuration["spotifyClientId"];
-        _spotifyClientSecret = _configuration["spotifyClientSecret"];
-    }
+        private readonly ISpotifyClient _client;
+        private readonly IConfiguration _configuration;
+        private readonly Serilog.ILogger _logger;
 
-    public async Task<string> GetToken()
-    {
-        var token = await _client.GetAccessToken(_spotifyClientId, _spotifyClientSecret);
-        return token;
-    }
+        private readonly string _spotifyClientId;
+        private readonly string _spotifyClientSecret;
+        private string _spotifyAccessToken;
 
-    public async Task<List<AlbumDto>> GetAllAlbums(string artistName, string accessToken)
-    {
-        List<AlbumDto> albums = new List<AlbumDto>();
-        const int Limit = 50;
-        int offset = 0;
-        int total = 0;
+        private const string _baseUrl = "https://api.spotify.com/v1/search";
 
-        do
+        public SpotifyApiService(ISpotifyClient client, IConfiguration configuration, Serilog.ILogger logger)
         {
-            _logger.Information($"Loop fired: Offset={offset} Total={total}");
-            //string query = $"%2520artist%3A{firstName}%2520{lastName}&type=album&locale=en-US&offset={offset}&limit={Limit}";
+            _client = client;
+            _configuration = configuration;
+            _logger = logger;
 
-            string query = Uri.EscapeDataString($"artist:{artistName}"); // Format the query string
-            string searchUrl = $"https://api.spotify.com/v1/search?q={query}&type=album&locale=en-US&offset={offset}&limit={Limit}";
+            _spotifyClientId = _configuration["spotifyClientId"];
+            _spotifyClientSecret = _configuration["spotifyClientSecret"];
+        }
+
+        public async Task<string> GetToken()
+        {
+            _spotifyAccessToken = await _client.GetAccessToken(_spotifyClientId, _spotifyClientSecret);
+            return _spotifyAccessToken;
+        }
+
+        public async Task<List<AlbumDto>> GetSpotifyAlbums(string artistName)
+        {
+            await GetToken();
+
+            List<AlbumDto> albums = new List<AlbumDto>();
+            const int Limit = 50;
+            int offset = 0;
+            int total = 0;
+
+            do
+            {
+                _logger.Information($"Loop fired: Offset={offset} Total={total}");
+
+                string query = Uri.EscapeDataString($"artist:{artistName}"); // Format the query string
+                string searchUrl = $"https://api.spotify.com/v1/search?q={query}&type=album&locale=en-US&offset={offset}&limit={Limit}";
+
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _spotifyAccessToken);
+                    var response = await httpClient.GetAsync(searchUrl);
+                    response = response.EnsureSuccessStatusCode();
+
+                    var jsonResponse = await response.Content.ReadAsStringAsync();
+                    SpotifyAlbumsApiResponse deserializedSpotifyData = JsonConvert.DeserializeObject<SpotifyAlbumsApiResponse>(jsonResponse);
+
+                    offset = deserializedSpotifyData.Albums.Offset;
+                    total = deserializedSpotifyData.Albums.Total;
+
+                    var filteredAlbums = FilterAlbumsByType(deserializedSpotifyData, artistName);
+
+                    foreach (var album in filteredAlbums)
+                    {
+                        albums.Add(album);
+                    }
+                }
+                offset = offset + Limit;
+            } while (offset < total);
+
+            return albums;
+        }
+
+        public List<AlbumDto> FilterAlbumsByType(SpotifyAlbumsApiResponse deserializedSpotifyData, string artistName)
+        {
+            var filteredAlbums = new List<AlbumDto>();
+
+            var albums = deserializedSpotifyData.Albums.Items;
+
+            foreach (var album in albums)
+            {
+                if (album.AlbumType == "album"
+                    && album.Artists.Any(x => x.Name.ToLower() == artistName.ToLower())
+                    && !filteredAlbums.Any(x => x.Name.Equals(album.Name, StringComparison.OrdinalIgnoreCase)))
+                {
+                    var image = album.Images.Where(image => image.Height == 640 && image.Width == 640).Select(image => image.Url).FirstOrDefault();
+                    List<ArtistDto> artists = album.Artists.Select(spotifyArtist => new ArtistDto
+                    {
+                        Name = spotifyArtist.Name,
+                        SpotifyId = spotifyArtist.Id,
+                    }).ToList();
+
+
+                    var filteredAlbum = new AlbumDto()
+                    {
+                        Name = album.Name,
+                        Artists = artists,
+                        ReleaseYear = album.ReleaseDate.Substring(0, 4),
+                        TotalTracks = album.TotalTracks,
+                        ImageUrl = image,
+                        SpotifyId = album.Id,
+                    };
+                    filteredAlbums.Add(filteredAlbum);
+                }
+            }
+            return filteredAlbums;
+        }
+
+        public async Task<ArtistDto> GetSpotifyArtist(ArtistDto artist)
+        {
+            string searchUrl = $"https://api.spotify.com/v1/artists/{artist.SpotifyId}";
+            SpotifyArtistApiResponse deserializedSpotifyData;
+            ArtistDto spotifyArtist;
 
             using (HttpClient httpClient = new HttpClient())
             {
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _spotifyAccessToken);
                 var response = await httpClient.GetAsync(searchUrl);
                 response = response.EnsureSuccessStatusCode();
 
                 var jsonResponse = await response.Content.ReadAsStringAsync();
-                SpotifyApiResponse deserializedSpotifyData = JsonConvert.DeserializeObject<SpotifyApiResponse>(jsonResponse);
+                deserializedSpotifyData = JsonConvert.DeserializeObject<SpotifyArtistApiResponse>(jsonResponse);
 
-                offset = deserializedSpotifyData.Albums.Offset;
-                total = deserializedSpotifyData.Albums.Total;
-
-                var filteredAlbums = FilterAlbumsByType(deserializedSpotifyData, artistName);
-
-                foreach (var album in filteredAlbums)
+                spotifyArtist = new ArtistDto()
                 {
-                    albums.Add(album);
-                }
-            }
-            offset = offset + Limit;
-        } while (offset < total);
-
-        return albums;
-    }
-
-    public List<AlbumDto> FilterAlbumsByType(SpotifyApiResponse deserializedSpotifyData, string artistName)
-    {
-        var filteredAlbums = new List<AlbumDto>();
-
-        var albums = deserializedSpotifyData.Albums.Items;
-
-        foreach (var album in albums)
-        {
-            if (album.AlbumType == "album" 
-                && album.Artists.Any(x => x.Name.ToLower() == artistName.ToLower()) 
-                && !filteredAlbums.Any(x => x.Name.Equals(album.Name, StringComparison.OrdinalIgnoreCase)))
-            {
-                var image = album.Images.Where(image => image.Height == 640 && image.Width == 640).Select(image => image.Url).FirstOrDefault();
-                List<ArtistDto> artists = album.Artists.Select(spotifyArtist => new ArtistDto
-                {
-                    Name = spotifyArtist.Name,
-                    Type = spotifyArtist.Type,
-                    SpotifyId = spotifyArtist.Id,
-                }).ToList();
-
-
-                var filteredAlbum = new AlbumDto()
-                {
-                    Name = album.Name,
-                    Artists = artists,
-                    ReleaseYear = album.ReleaseDate.Substring(0,4),
-                    TotalTracks = album.TotalTracks,
-                    ImageUrl = image,
-                    SpotifyId = album.Id,
+                    Name = deserializedSpotifyData.Name,
+                    Genres = deserializedSpotifyData.Genres,
+                    ImageUrl = deserializedSpotifyData.Images.OrderByDescending(img => img.Height).FirstOrDefault().Url,
+                    PopularityScore = deserializedSpotifyData.PopularityScore,
                 };
-                filteredAlbums.Add(filteredAlbum);
             }
+            return spotifyArtist;
         }
-        return filteredAlbums;
     }
 }
