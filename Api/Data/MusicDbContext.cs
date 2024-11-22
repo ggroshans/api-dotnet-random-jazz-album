@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RandomAlbumApi.Models;
+using Api.Models;
+using Api.Utilities;
 
-namespace RandomAlbumApi.Data
+namespace Api.Data
 {
     public class MusicDbContext : DbContext
     {
@@ -24,6 +25,35 @@ namespace RandomAlbumApi.Data
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
+            foreach (var entity in modelBuilder.Model.GetEntityTypes())
+            {
+                // Set table name to snake_case
+                entity.SetTableName(StringUtils.ConvertToSnakeCase(entity.GetTableName()));
+
+                // Set column names to snake_case
+                foreach (var property in entity.GetProperties())
+                {
+                    property.SetColumnName(StringUtils.ConvertToSnakeCase(property.Name));
+                }
+
+                // Handle keys and foreign keys
+                foreach (var key in entity.GetKeys())
+                {
+                    key.SetName(StringUtils.ConvertToSnakeCase(key.GetName()));
+                }
+
+                foreach (var foreignKey in entity.GetForeignKeys())
+                {
+                    foreignKey.SetConstraintName(StringUtils.ConvertToSnakeCase(foreignKey.GetConstraintName()));
+                }
+
+                foreach (var index in entity.GetIndexes())
+                {
+                    index.SetDatabaseName(StringUtils.ConvertToSnakeCase(index.GetDatabaseName()));
+                }
+            }
+
             // mapping table names to lowercase
             modelBuilder.Entity<Album>().ToTable("albums");
             modelBuilder.Entity<Artist>().ToTable("artists");
