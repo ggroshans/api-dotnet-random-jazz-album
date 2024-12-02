@@ -58,7 +58,7 @@ namespace Api.Services.ApiServices
             string schema = @"
         {
             ""description"": { ""type"": ""string"" }, // album description or release notes (~500 characters)
-            ""genre"": { ""type"": ""string"" }, // primary music genre (e.g., rock, jazz)
+            ""genre"": { ""type"": ""string"" }, // primary music genre (Only options are jazz, blues, funk)
             ""subgenres"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } }, // list of subgenres
             ""moods"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } }, // list of moods that describe the album
             ""popular_tracks"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } }, // list of the most popular tracks from the album
@@ -73,6 +73,10 @@ namespace Api.Services.ApiServices
                     $"formatted in a single line without line breaks or extra spaces," +
                     $"and without any code block formatting or additional text:");
                 prompt.AppendLine(schema);
+                prompt.AppendLine("Only pick from these Genres and Subgenres:");
+                prompt.AppendLine("Genre: Jazz, Subgenres: Swing, Bebop, Hard Bop, Cool Jazz, Modal Jazz, Free Jazz, Fusion, Latin Jazz, Soul Jazz, Smooth Jazz, Gypsy Jazz, Acid Jazz, Post-Bop, Avant-Garde Jazz, Dixieland, Jazz-Funk, Jazz Rap, Big Band, Vocal Jazz, Jazz Blues, Neo-Bop, Third Stream, Ethio-Jazz, M-Base, Nu Jazz, Spiritual Jazz");
+                prompt.AppendLine("Genre: Blues, Subgenres: Delta Blues, Chicago Blues, Texas Blues, Piedmont Blues, Memphis Blues, Country Blues, Urban Blues, Jump Blues, Electric Blues, Swamp Blues, Blues Rock, Boogie-Woogie, Soul Blues, Gospel Blues, Acoustic Blues, British Blues, West Coast Blues, Rhythm and Blues (R&B), Funk Blues, Hill Country Blues, Jazz Blues, Punk Blues, New Orleans Blues, Louisiana Blues, Contemporary Blues, Ragtime Blues");
+                prompt.AppendLine("Genre: Funk, Subgenres: P-Funk, Funk Rock, Funk Metal, Funk Soul, G-Funk, Jazz-Funk, Electro-Funk, Afrobeat, Go-Go, Psychedelic Funk, Disco Funk, Minneapolis Sound, Boogie, Funk Pop, Latin Funk, New Orleans Funk, Experimental Funk, Neo-Funk, Rare Groove, Future Funk");
 
                 var chatCompletion = await _client.CompleteChatAsync(prompt.ToString());
                 var responseContent = chatCompletion?.Value.Content[0].Text;
