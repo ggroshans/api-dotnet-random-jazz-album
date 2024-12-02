@@ -89,11 +89,18 @@ namespace Api.Services.ApiServices.Spotify
                     && !filteredAlbums.Any(x => x.Name.Equals(album.Name, StringComparison.OrdinalIgnoreCase)))
                 {
                     var image = album.Images.Where(image => image.Height == 640 && image.Width == 640).Select(image => image.Url).FirstOrDefault();
-                    List<ArtistDto> artists = album.Artists.Select(spotifyArtist => new ArtistDto
+
+                    var featuredArtist = album.Artists.First(x => x.Name.ToLower() == artistName.ToLower());
+
+                    List<ArtistDto> artists = new List<ArtistDto>
                     {
-                        Name = spotifyArtist.Name,
-                        SpotifyId = spotifyArtist.Id,
-                    }).ToList();
+                        new ArtistDto
+                        {
+                            Name = featuredArtist.Name,
+                            SpotifyId = featuredArtist.Id,
+                        } 
+                    };
+
 
 
                     var filteredAlbum = new AlbumDto()
