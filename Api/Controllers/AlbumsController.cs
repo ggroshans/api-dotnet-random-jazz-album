@@ -27,21 +27,21 @@ namespace Api.Controllers
             _populateDbService = populateDbService;
         }
 
-        [HttpPost("gpt")]
-        public async Task<IActionResult> CreateAlbum([FromBody] AlbumRequest albumRequest)
-        {
+        //[HttpPost("gpt")]
+        //public async Task<IActionResult> CreateAlbum([FromBody] AlbumRequest albumRequest)
+        //{
 
-            var chatCompletionObject = _openAIservice.GetAlbumDetailAsync(albumRequest.ArtistName, albumRequest.AlbumName).Result;
-            var response = chatCompletionObject.Content[0].Text;
-            return Ok(response);
+        //    var chatCompletionObject = _openAIservice.GetAlbumDetailAsync(albumRequest.ArtistName, albumRequest.AlbumName).Result;
+        //    var response = chatCompletionObject.Content[0].Text;
+        //    return Ok(response);
 
-        }
+        //}
         [HttpPost("spotify")]
         public async Task<IActionResult> CreateAlbumsFromArtist([FromBody] AlbumRequest albumRequest)
         {
             var spotifyAlbums = await _spotifyApiService.GetSpotifyAlbums(albumRequest.ArtistName);
             var gptAlbums = await _openAIservice.GetGptAlbumDetails(spotifyAlbums, albumRequest.ArtistName);
-            await _populateDbService.PopulateAlbumAsync(gptAlbums);
+            //await _populateDbService.PopulateAlbumAsync(gptAlbums);
             return Ok(gptAlbums);
         }
     }
