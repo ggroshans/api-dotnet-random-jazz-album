@@ -11,7 +11,7 @@ namespace Api.DTOs
         public string ReleaseYear { get; set; }
         public int TotalTracks { get; set; }
         public string ImageUrl { get; set; }
-        public string SpotifyId { get; set; }
+        public required string SpotifyId { get; set; }
 
         //gpt fields
         public string? Description { get; set; }

@@ -2,10 +2,12 @@
 {
     public class AlbumArtist
     {
+        // relationships 
         public int AlbumId { get; set; }
         public Album Album { get; set; }
         public int ArtistId { get; set; }
         public Artist Artist { get; set; }
-
+        public Guid GptBatchUpdateId { get; set; }
+        public GptBatchUpdate GptBatchUpdate { get; set; }
     }
 }

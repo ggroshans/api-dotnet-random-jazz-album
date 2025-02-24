@@ -15,5 +15,7 @@
 
         //relationships
         public List<AlbumArtist> AlbumArtists { get; set; } = new List<AlbumArtist>();
+        public Guid GptBatchUpdateId { get; set; }
+        public GptBatchUpdate GptBatchUpdate { get; set; }
     }
 }

@@ -12,6 +12,7 @@ namespace Api.Data
         public DbSet<Genre> Genres { get; set; }
         public DbSet<Subgenre> Subgenres { get; set; }
         public DbSet<Mood> Moods { get; set; }  
+        public DbSet<GptBatchUpdate> GptBatchUpdates { get; set; }
 
         // Junction tables for many-to-many
         public DbSet<AlbumArtist> AlbumArtists { get; set; }
@@ -60,6 +61,7 @@ namespace Api.Data
             modelBuilder.Entity<Genre>().ToTable("genres");
             modelBuilder.Entity<Subgenre>().ToTable("subgenres");
             modelBuilder.Entity<Mood>().ToTable("moods");
+            modelBuilder.Entity<GptBatchUpdate>().ToTable("gpt_batch_updates");
 
             modelBuilder.Entity<AlbumArtist>().ToTable("album_artists");
             modelBuilder.Entity<AlbumGenre>().ToTable("album_genres");
@@ -127,6 +129,65 @@ namespace Api.Data
                 .HasOne(s => s.Genre)
                 .WithMany(g => g.Subgenres)
                 .HasForeignKey(s => s.GenreId);
+
+
+            // ***
+            // GptBatchUpdate Relationships
+            // ***
+
+            // Album + GptBatchUpdate (one to many)
+            modelBuilder.Entity<Album>()
+                .HasOne(a => a.GptBatchUpdate)
+                .WithMany(g => g.Albums)
+                .HasForeignKey(a => a.GptBatchUpdateId);
+
+            // Artist + GptBatchUpdate (one to many)
+            modelBuilder.Entity<Artist>()
+                .HasOne(a => a.GptBatchUpdate)
+                .WithMany(g => g.Artists)
+                .HasForeignKey(a => a.GptBatchUpdateId);
+
+            // Genre + GptBatchUpdate (one to many)
+            modelBuilder.Entity<Genre>()
+                .HasOne(g => g.GptBatchUpdate)
+                .WithMany(g => g.Genres)
+                .HasForeignKey(a => a.GptBatchUpdateId);
+
+            // Mood + GptBatchUpdate (one to many)
+            modelBuilder.Entity<Mood>()
+                .HasOne(m => m.GptBatchUpdate)
+                .WithMany(g => g.Moods)
+                .HasForeignKey(a => a.GptBatchUpdateId);
+
+            // Subgenre + GptBatchUpdate (one to many)
+            modelBuilder.Entity<Subgenre>()
+                .HasOne(s => s.GptBatchUpdate)
+                .WithMany(g => g.Subgenres)
+                .HasForeignKey(a => a.GptBatchUpdateId);
+
+            // AlbumArtist + GptBatchUpdate (one to many)
+            modelBuilder.Entity<AlbumArtist>()
+                .HasOne(aa => aa.GptBatchUpdate)
+                .WithMany(g => g.AlbumArtists)
+                .HasForeignKey(aa => aa.GptBatchUpdateId);
+
+            // AlbumGenre + GptBatchUpdate (one to many)
+            modelBuilder.Entity<AlbumGenre>()
+                .HasOne(ag => ag.GptBatchUpdate)
+                .WithMany(g => g.AlbumGenres)
+                .HasForeignKey(ag => ag.GptBatchUpdateId);
+
+            // AlbumMood + GptBatchUpdate (one to many)
+            modelBuilder.Entity<AlbumMood>()
+                .HasOne(am => am.GptBatchUpdate)
+                .WithMany(g => g.AlbumMoods)
+                .HasForeignKey(am => am.GptBatchUpdateId);
+
+            // AlbumSubgenre + GptBatchUpdate (one to many)
+            modelBuilder.Entity<AlbumSubgenre>()
+                .HasOne(asg => asg.GptBatchUpdate)
+                .WithMany(g => g.AlbumSubgenres)
+                .HasForeignKey(asg => asg.GptBatchUpdateId);
         }
     }    
 }

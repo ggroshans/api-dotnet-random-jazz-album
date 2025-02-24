@@ -4,7 +4,11 @@
     {
         public int Id { get; set; }
         public string Name { get; set; }
+
+        // relationships
         public List<Subgenre> Subgenres { get; set; } = new List<Subgenre>();
         public List<AlbumGenre> AlbumGenres { get; set; } = new List<AlbumGenre>();
+        public Guid GptBatchUpdateId { get; set; }
+        public GptBatchUpdate GptBatchUpdate { get; set; }
     }
 }
