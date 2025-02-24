@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Api.Models;
 using Api.Utilities;
+using Api.Domain.Entities;
 
 namespace Api.Data
 {

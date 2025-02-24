@@ -1,6 +1,6 @@
-﻿namespace Api.Models
+﻿namespace Api.DTOs
 {
-    public class AlbumRequest
+    public class AlbumRequestDto
     {
         public string ArtistName { get; set; }
         public string? AlbumName { get; set; }

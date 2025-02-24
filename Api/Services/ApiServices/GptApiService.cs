@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 using OpenAI.Chat;
-using Api.Models;
 using System.Text;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Api.DTOs;
 
 namespace Api.Services.ApiServices
 {

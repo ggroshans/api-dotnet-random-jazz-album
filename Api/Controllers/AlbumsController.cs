@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Api.Services.ApiServices;
-using Api.Models;
 using Api.Services;
 using Api.Services.ApiServices.Spotify;
+using Api.DTOs;
 
 namespace Api.Controllers
 {
@@ -37,7 +37,7 @@ namespace Api.Controllers
 
         //}
         [HttpPost("spotify")]
-        public async Task<IActionResult> CreateAlbumsFromArtist([FromBody] AlbumRequest albumRequest)
+        public async Task<IActionResult> CreateAlbumsFromArtist([FromBody] AlbumRequestDto albumRequest)
         {
             var spotifyAlbums = await _spotifyApiService.GetSpotifyAlbums(albumRequest.ArtistName);
             var gptAlbums = await _openAIservice.GetGptAlbumDetails(spotifyAlbums, albumRequest.ArtistName);

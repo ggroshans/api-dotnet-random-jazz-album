@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Net.Http.Headers;
-using Api.Models;
+using Api.DTOs;
 using Api.Services.AuthServices.Spotify;
 using Newtonsoft.Json;
 
 namespace Api.Services.ApiServices.Spotify
-{ 
+{
     public class SpotifyApiService
     {
 

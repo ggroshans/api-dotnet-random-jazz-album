@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Api.Data;
-using Api.Models;
 using Api.Services.ApiServices;
 using Api.Services.ApiServices.Spotify;
+using Api.DTOs;
+using Api.Domain.Entities;
 
 namespace Api.Services
 {
