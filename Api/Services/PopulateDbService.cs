@@ -20,7 +20,7 @@ namespace Api.Services
             _gptApiService = gptApiService;
         }
 
-        public async Task PopulateAlbumAsync(List<AlbumDto> albumDtos)
+        public async Task PopulateAlbumAsync(Guid gptBatchUpdateId, List<AlbumDto> albumDtos)
         {
             foreach (var albumDto in albumDtos)
             {
@@ -35,6 +35,7 @@ namespace Api.Services
                     Description = albumDto.Description, 
                     PopularTracks = albumDto.PopularTracks,
                     AlbumTheme = albumDto.AlbumTheme,
+                    GptBatchUpdateId = gptBatchUpdateId,
                 };
 
                 _db.Albums.Add(album);
@@ -54,7 +55,8 @@ namespace Api.Services
                             Genres = populatedArtist.Genres,
                             ImageUrl = populatedArtist.ImageUrl,
                             PopularityScore = populatedArtist.PopularityScore,
-                            SpotifyId = artistDto.SpotifyId
+                            SpotifyId = artistDto.SpotifyId,
+                            GptBatchUpdateId = gptBatchUpdateId,
                         };
                         _db.Artists.Add(existingArtist);
                     }
@@ -65,6 +67,7 @@ namespace Api.Services
                         {
                             Album = album,
                             Artist = existingArtist,
+                            GptBatchUpdateId= gptBatchUpdateId,
                         });
                     }
                 }
@@ -75,6 +78,7 @@ namespace Api.Services
                     existingGenre = new Genre
                     {
                         Name = albumDto.Genre,
+                        GptBatchUpdateId = gptBatchUpdateId
                     };
 
                     _db.Genres.Add(existingGenre);
@@ -87,6 +91,7 @@ namespace Api.Services
                     { 
                         Album = album,
                         Genre = existingGenre,
+                        GptBatchUpdateId = gptBatchUpdateId
                     });     
                 }
 
@@ -100,6 +105,7 @@ namespace Api.Services
                         existingMood = new Mood
                         {
                             Name = moodDto,
+                            GptBatchUpdateId = gptBatchUpdateId
                         };
 
                         _db.Moods.Add(existingMood);
@@ -112,7 +118,8 @@ namespace Api.Services
                         _db.AlbumMoods.Add(new AlbumMood
                         {
                             Album = album,
-                            Mood = existingMood
+                            Mood = existingMood,
+                            GptBatchUpdateId = gptBatchUpdateId
                         });
                     }
                 }
@@ -128,6 +135,7 @@ namespace Api.Services
                         {
                             Name = subgenreDto,
                             GenreId = existingGenre.Id,
+                            GptBatchUpdateId = gptBatchUpdateId
                         };
                         _db.Subgenres.Add(existingSubgenre);
                         await _db.SaveChangesAsync();
@@ -140,6 +148,7 @@ namespace Api.Services
                         {
                             Album = album,
                             Subgenre = existingSubgenre,
+                            GptBatchUpdateId = gptBatchUpdateId
                         });
                     }
                 }
