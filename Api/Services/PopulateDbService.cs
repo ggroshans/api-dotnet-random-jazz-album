@@ -4,6 +4,7 @@ using Api.Services.ApiServices;
 using Api.Services.ApiServices.Spotify;
 using Api.DTOs;
 using Api.Domain.Entities;
+using Api.Utilities;
 
 namespace Api.Services
 {
@@ -27,7 +28,7 @@ namespace Api.Services
                 // -------- Overall Album --------
                 var album = new Album
                 {
-                    Name = albumDto.Name,
+                    Name = StringUtils.CapitalizeAndFormat(albumDto.Name),
                     ReleaseYear = albumDto.ReleaseYear,
                     TotalTracks = albumDto.TotalTracks,
                     ImageUrl = albumDto.ImageUrl,
@@ -39,6 +40,7 @@ namespace Api.Services
                 };
 
                 _db.Albums.Add(album);
+                await _db.SaveChangesAsync();
 
                 //  -------- Artist --------
                 foreach (var artistDto in albumDto.Artists)
@@ -50,7 +52,7 @@ namespace Api.Services
                         var populatedArtist = await GetArtistDetailsAsync(artistDto);
                         existingArtist = new Artist
                         {
-                            Name = artistDto.Name,
+                            Name = StringUtils.CapitalizeAndFormat(artistDto.Name),
                             Biography = populatedArtist.Biography,
                             Genres = populatedArtist.Genres,
                             ImageUrl = populatedArtist.ImageUrl,
@@ -59,6 +61,8 @@ namespace Api.Services
                             GptBatchUpdateId = gptBatchUpdateId,
                         };
                         _db.Artists.Add(existingArtist);
+                        await _db.SaveChangesAsync();
+                        
                     }
                     // ** Album Artist Junction Table **
                     if (!await _db.AlbumArtists.AnyAsync(aa => aa.ArtistId == artistDto.Id && aa.AlbumId == album.Id))
@@ -69,6 +73,7 @@ namespace Api.Services
                             Artist = existingArtist,
                             GptBatchUpdateId= gptBatchUpdateId,
                         });
+                        await _db.SaveChangesAsync();
                     }
                 }
                 // ------- Genre -------
@@ -77,7 +82,7 @@ namespace Api.Services
                 {
                     existingGenre = new Genre
                     {
-                        Name = albumDto.Genre,
+                        Name = StringUtils.CapitalizeAndFormat(albumDto.Genre),
                         GptBatchUpdateId = gptBatchUpdateId
                     };
 
@@ -92,7 +97,8 @@ namespace Api.Services
                         Album = album,
                         Genre = existingGenre,
                         GptBatchUpdateId = gptBatchUpdateId
-                    });     
+                    });
+                    await _db.SaveChangesAsync();
                 }
 
                 // ------- Mood -------
@@ -104,7 +110,7 @@ namespace Api.Services
                     {
                         existingMood = new Mood
                         {
-                            Name = moodDto,
+                            Name = StringUtils.CapitalizeAndFormat(moodDto),
                             GptBatchUpdateId = gptBatchUpdateId
                         };
 
@@ -121,6 +127,7 @@ namespace Api.Services
                             Mood = existingMood,
                             GptBatchUpdateId = gptBatchUpdateId
                         });
+                        await _db.SaveChangesAsync();
                     }
                 }
 
@@ -129,11 +136,12 @@ namespace Api.Services
                 {
                     var existingSubgenre = _db.Subgenres.FirstOrDefault(sg => sg.Name.ToLower() == subgenreDto.ToLower());
 
+
                     if (existingSubgenre == null)
                     {
                         existingSubgenre = new Subgenre
                         {
-                            Name = subgenreDto,
+                            Name = StringUtils.CapitalizeAndFormat(subgenreDto),
                             GenreId = existingGenre.Id,
                             GptBatchUpdateId = gptBatchUpdateId
                         };
@@ -150,10 +158,10 @@ namespace Api.Services
                             Subgenre = existingSubgenre,
                             GptBatchUpdateId = gptBatchUpdateId
                         });
+                        await _db.SaveChangesAsync();
                     }
                 }
             }
-            await _db.SaveChangesAsync();
         }
 
         public async Task<ArtistDto> GetArtistDetailsAsync(ArtistDto artist)
