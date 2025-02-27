@@ -3,6 +3,11 @@ using OpenAI.Chat;
 using System.Text;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Api.DTOs;
+using Api.Domain.Entities;
+using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
+using Api.Data;
+using Api.Services.ApiServices.Spotify;
 
 namespace Api.Services.ApiServices
 {
@@ -10,106 +15,119 @@ namespace Api.Services.ApiServices
     {
         private readonly string _apiKey;
         private readonly ChatClient _client;
+        private readonly MusicDbContext _dbContext;
 
-        public GptApiService(IConfiguration configuration)
+        public GptApiService(IConfiguration configuration, MusicDbContext dbContext)
         {
             _apiKey = configuration["openai"];
             _client = new(model: "gpt-4o", apiKey: _apiKey);
+            _dbContext = dbContext;
         }
 
-        //public async Task<ChatCompletion> GetAlbumDetailAsync(string artistName, string albumName)
-        //{
-        //    string schema = @"{
-        //      ""title"": { ""type"": ""string"" }, // album title
-        //      ""artist_name"": { ""type"": ""string"" }, // musician's name
-        //      ""release_year"": { ""type"": ""int"" }, // album release year 
-        //      ""genre"": { ""type"": ""string"" }, // primary music genre (e.g., rock, jazz)
-        //      ""sub_genres"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } }, // list of subgenres
-        //      ""cover_image_url"": { ""type"": ""string"", ""format"": ""uri"" }, // URL of the album cover image
-        //      ""total_tracks"": { ""type"": ""integer"" }, // total number of tracks in the album
-        //      ""label"": { ""type"": ""string"" }, // record label
-        //      ""mood"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } }, // list of moods that describe the album
-        //      ""recording_location"": { ""type"": ""string"" }, // where the album was recorded: city, state
-        //      ""length"": { ""type"": ""integer"" }, // total album length in minutes
-        //      ""release_notes"": { ""type"": ""string"" }, // artist's notes or comments on the release
-        //      ""album_theme"": { ""type"": ""string"" }, // main theme or concept of the album
-        //      ""story_behind_title"": { ""type"": ""string"" }, // explanation of the album's title and significance
-        //      ""album_position"": { ""type"": ""integer"" }, // position of the album in the artist's discography (e.g., 1st, 5th)
-        //      ""popular_tracks"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } }, // list of the most popular tracks from the album
-        //      ""awards"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } }, // list of awards in 'award (year)' format
-        //      ""cover_art_description"": { ""type"": ""string"" }, // brief description of the album cover design and concept
-        //      ""personal_anecdotes"": { ""type"": ""string"" }, // artist or producer anecdotes about the making of the album
-        //      ""setlist_context"": { ""type"": ""string"" }, // details on how tracks fit into live performances or tours
-        //      ""created_at"": { ""type"": ""string"", ""format"": ""date-time"" }, // timestamp when the record was created
-        //      ""updated_at"": { ""type"": ""string"", ""format"": ""date-time"" } // timestamp when the record was last updated
-        //    }";
-
-        //    var prompt = new StringBuilder();
-        //    prompt.AppendLine($"For the album: {albumName} by {artistName}, return a json object using this schema:");
-        //    prompt.AppendLine(schema);
-
-        //    var chatCompletion = await _client.CompleteChatAsync(prompt.ToString());
-
-        //    return chatCompletion;
-        //} 
-
-        public async Task<List<AlbumDto>> GetGptAlbumDetails(List<AlbumDto> albums, string artistName)
+        public async Task<(GptBatchUpdate, List<AlbumDto>)> GetGptAlbumDetails(List<AlbumDto> spotifyAlbums, string artistName, GptBatchUpdate gptBatchUpdate)
         {
             List<string> albumNames = new List<string>();
 
-            foreach (var album in albums)
+            foreach (var album in spotifyAlbums)
             {
                 albumNames.Add(album.Name);
             }
 
             string schema = @"
-            {
-            ""name"": { ""type"": ""string""},
-            ""description"": { ""type"": ""string"" }, // album description or release notes (~500 characters)
-            ""genre"": { ""type"": ""string"" }, // primary music genre (Only options are jazz, blues, funk)
-            ""subgenres"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } }, // list of subgenres
-            ""moods"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } }, // list of moods that describe the album
-            ""popular_tracks"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } }, // list of the most popular tracks from the album
-            ""album_theme"": { ""type"": ""string"" } // main theme or concept of the album
-            }";
+    {
+        ""name"": { ""type"": ""string""},
+        ""description"": { ""type"": ""string"" }, // album description or release notes (~500 characters)
+        ""genre"": { ""type"": ""string"" }, // primary music genre (Only option is jazz)
+        ""subgenres"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } }, // list of subgenres
+        ""moods"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } }, // list of moods that describe the album
+        ""popular_tracks"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } }, // list of the most popular tracks from the album
+        ""album_theme"": { ""type"": ""string"" } // main theme or concept of the album
+    }";
 
             var prompt = new StringBuilder();
             prompt.AppendLine("Iterate through this string of album names, return a JSON array where each object (album) adheres to this schema:");
             prompt.AppendLine(schema);
             prompt.AppendLine("Formatted in a single line without line breaks or extra spaces, and without any code block formatting or additional text.");
-            prompt.AppendLine("Only update each album object from these Genres and Subgenres:");
+            prompt.AppendLine("Only update each album object from this Genres and these Subgenres");
             prompt.AppendLine("Genre: Jazz, Subgenres: Swing, Bebop, Hard Bop, Cool Jazz, Modal Jazz, Free Jazz, Fusion, Latin Jazz, Soul Jazz, Smooth Jazz, Gypsy Jazz, Acid Jazz, Post-Bop, Avant-Garde Jazz, Dixieland, Jazz-Funk, Jazz Rap, Big Band, Vocal Jazz, Jazz Blues, Neo-Bop, Third Stream, Ethio-Jazz, M-Base, Nu Jazz, Spiritual Jazz");
-            prompt.AppendLine("Genre: Blues, Subgenres: Delta Blues, Chicago Blues, Texas Blues, Piedmont Blues, Memphis Blues, Country Blues, Urban Blues, Jump Blues, Electric Blues, Swamp Blues, Blues Rock, Boogie-Woogie, Soul Blues, Gospel Blues, Acoustic Blues, British Blues, West Coast Blues, Rhythm and Blues (R&B), Funk Blues, Hill Country Blues, Jazz Blues, Punk Blues, New Orleans Blues, Louisiana Blues, Contemporary Blues, Ragtime Blues");
-            prompt.AppendLine("Genre: Funk, Subgenres: P-Funk, Funk Rock, Funk Metal, Funk Soul, G-Funk, Jazz-Funk, Electro-Funk, Afrobeat, Go-Go, Psychedelic Funk, Disco Funk, Minneapolis Sound, Boogie, Funk Pop, Latin Funk, New Orleans Funk, Experimental Funk, Neo-Funk, Rare Groove, Future Funk");
+            prompt.AppendLine("Ensure that all albums are processed and included in the JSON response.");
+            //prompt.AppendLine("Genre: Blues, Subgenres: Delta Blues, Chicago Blues, Texas Blues, Piedmont Blues, Memphis Blues, Country Blues, Urban Blues, Jump Blues, Electric Blues, Swamp Blues, Blues Rock, Boogie-Woogie, Soul Blues, Gospel Blues, Acoustic Blues, British Blues, West Coast Blues, Rhythm and Blues (R&B), Funk Blues, Hill Country Blues, Jazz Blues, Punk Blues, New Orleans Blues, Louisiana Blues, Contemporary Blues, Ragtime Blues");
+            //prompt.AppendLine("Genre: Funk, Subgenres: P-Funk, Funk Rock, Funk Metal, Funk Soul, G-Funk, Jazz-Funk, Electro-Funk, Afrobeat, Go-Go, Psychedelic Funk, Disco Funk, Minneapolis Sound, Boogie, Funk Pop, Latin Funk, New Orleans Funk, Experimental Funk, Neo-Funk, Rare Groove, Future Funk");
             prompt.AppendLine($"Albums: {string.Join(", ", albumNames)}");
 
-            var chatCompletion = await _client.CompleteChatAsync(prompt.ToString());
-            var responseContent = chatCompletion?.Value.Content[0].Text;
-            var albumDetails = new List<AlbumDto>();
+            gptBatchUpdate.RequestDetails = prompt.ToString();
 
-            if (!string.IsNullOrEmpty(responseContent))
+            try
             {
-                try
-                { 
-                    albumDetails = JsonConvert.DeserializeObject<List<AlbumDto>>(responseContent);
-                }
-                catch (JsonSerializationException ex)
-                {
-                    Console.WriteLine($"JSON Serialization Exception: {ex.Message}");
-                    Console.WriteLine($"GPT Response: {responseContent}"); 
-                }
-                catch (Exception ex) 
-                {
-                    Console.WriteLine($"Unexpected Exception: {ex.Message}");
-                }
-            }
-            else 
-            {
-                Console.WriteLine("GPT response data null");
-            }
+                var chatCompletion = await _client.CompleteChatAsync(prompt.ToString());
+                var responseContent = chatCompletion?.Value.Content[0].Text;
+                var processedAlbums = new List<AlbumDto>();
 
-            return albumDetails;
+                if (!string.IsNullOrEmpty(responseContent))
+                {
+                    try
+                    {
+                        var gptAlbums = JsonConvert.DeserializeObject<List<AlbumDto>>(responseContent);
+                        
+                        foreach (var spotifyAlbum in spotifyAlbums)
+                        {
+                            var matchingGptAlbum = gptAlbums.Where(g => g.Name == spotifyAlbum.Name).FirstOrDefault();
+                            
+                            if (matchingGptAlbum != null)
+                            {
+                                var updatedAlbum = new AlbumDto
+                                {
+                                     Name = spotifyAlbum.Name,
+                                     Artists = spotifyAlbum.Artists,
+                                     ReleaseYear = spotifyAlbum.ReleaseYear,
+                                     TotalTracks = spotifyAlbum.TotalTracks,
+                                     ImageUrl = spotifyAlbum.ImageUrl,
+                                     SpotifyId = spotifyAlbum.SpotifyId,
+                                     Description = matchingGptAlbum.Description,
+                                     Genre = matchingGptAlbum.Genre,
+                                     Subgenres = matchingGptAlbum.Subgenres,
+                                     Moods = matchingGptAlbum.Moods,
+                                     PopularTracks = matchingGptAlbum.PopularTracks,
+                                     AlbumTheme = matchingGptAlbum.AlbumTheme,
+                                };
+
+                                processedAlbums.Add(updatedAlbum);
+                            }
+                        }
+                    }
+                    catch (JsonSerializationException ex)
+                    {
+                        Console.WriteLine($"JSON Serialization Exception: {ex.Message}");
+                        Console.WriteLine($"GPT Response: {responseContent}");
+                        gptBatchUpdate.ErrorMessage = ex.Message;
+                        gptBatchUpdate.ResponseStatusCode = 500; 
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Unexpected Exception: {ex.Message}");
+                        gptBatchUpdate.ErrorMessage = ex.Message;
+                        gptBatchUpdate.ResponseStatusCode = 500; 
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("GPT response data null");
+                    gptBatchUpdate.ErrorMessage = "GPT response data was null";
+                    gptBatchUpdate.ResponseStatusCode = 500; 
+                }
+
+                return (gptBatchUpdate, processedAlbums);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"GPT request failed: {ex.Message}");
+                gptBatchUpdate.ErrorMessage = ex.Message;
+                gptBatchUpdate.ResponseStatusCode = 500; 
+
+                return (gptBatchUpdate, new List<AlbumDto>()); 
+            }
         }
+
 
         public async Task<ArtistDto> GetGptArtistDetails(ArtistDto artist)
         {
@@ -148,6 +166,35 @@ namespace Api.Services.ApiServices
                 
             }
             return artist;
+        }
+
+        public async Task<(Guid, List<AlbumDto>)> BatchProcessAlbums(List<AlbumDto> albums, string artistName)
+        {
+            var gptBatchUpdate = new GptBatchUpdate
+            {
+                Id = new Guid()
+            };
+
+            List<AlbumDto> unprocessedAlbums = albums;
+            List<AlbumDto> processedAlbums = new List<AlbumDto>();
+            var albumCount = albums.Count;
+           
+            while (unprocessedAlbums.Count > 0)
+            {
+                var batchSize = Math.Min(20, unprocessedAlbums.Count);
+                var albumsBatch = unprocessedAlbums.Take(batchSize).ToList();
+                var (gptBatchUpdateResponse, gptAlbums) = await GetGptAlbumDetails(albumsBatch, artistName, gptBatchUpdate);
+
+                gptBatchUpdate = gptBatchUpdateResponse;
+                processedAlbums.AddRange(gptAlbums);
+
+                unprocessedAlbums = unprocessedAlbums.Skip(batchSize).ToList();
+            }
+
+            await _dbContext.GptBatchUpdates.AddAsync(gptBatchUpdate);
+            await _dbContext.SaveChangesAsync();
+
+            return (gptBatchUpdate.Id, processedAlbums);
         }
     }
 }
