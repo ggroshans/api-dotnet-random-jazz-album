@@ -7,7 +7,7 @@
         public Album Album { get; set; }
         public int ArtistId { get; set; }
         public Artist Artist { get; set; }
-        public Guid GptBatchUpdateId { get; set; }
-        public GptBatchUpdate GptBatchUpdate { get; set; }
+        public Guid DiscoTransactionId { get; set; }
+        public DiscoTransaction DiscoTransaction { get; set; }
     }
 }

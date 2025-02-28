@@ -17,8 +17,6 @@ namespace Api.Controllers
         public readonly GptApiService _openAIservice;
         private readonly PopulateDbService _populateDbService;
 
-
-
         public AlbumsController( Serilog.ILogger logger, GptApiService openAIService, SpotifyApiService spotifyApiService, PopulateDbService populateDbService)
         {
             _logger = logger;
@@ -27,22 +25,13 @@ namespace Api.Controllers
             _populateDbService = populateDbService;
         }
 
-        //[HttpPost("gpt")]
-        //public async Task<IActionResult> CreateAlbum([FromBody] AlbumRequest albumRequest)
-        //{
-
-        //    var chatCompletionObject = _openAIservice.GetAlbumDetailAsync(albumRequest.ArtistName, albumRequest.AlbumName).Result;
-        //    var response = chatCompletionObject.Content[0].Text;
-        //    return Ok(response);
-
-        //}
         [HttpPost("spotify")]
         public async Task<IActionResult> CreateAlbumsFromArtist([FromBody] AlbumRequestDto albumRequest)
         {
             var spotifyAlbums = await _spotifyApiService.GetSpotifyAlbums(albumRequest.ArtistName);
-            var gptAlbums = await _openAIservice.GetGptAlbumDetails(spotifyAlbums, albumRequest.ArtistName);
-            //await _populateDbService.PopulateAlbumAsync(gptAlbums);
-            return Ok(gptAlbums);
+            var (discoTransactionId, processedAlbums) = await _openAIservice.BatchProcessAlbums(spotifyAlbums, albumRequest.ArtistName);
+            await _populateDbService.PopulateAlbumAsync(discoTransactionId, processedAlbums);
+            return Ok(processedAlbums);
         }
     }
 }

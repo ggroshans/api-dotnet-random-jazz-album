@@ -12,7 +12,7 @@ namespace Api.Data
         public DbSet<Genre> Genres { get; set; }
         public DbSet<Subgenre> Subgenres { get; set; }
         public DbSet<Mood> Moods { get; set; }  
-        public DbSet<GptBatchUpdate> GptBatchUpdates { get; set; }
+        public DbSet<DiscoTransaction> DiscoTransactions { get; set; }
 
         // Junction tables for many-to-many
         public DbSet<AlbumArtist> AlbumArtists { get; set; }
@@ -61,7 +61,7 @@ namespace Api.Data
             modelBuilder.Entity<Genre>().ToTable("genres");
             modelBuilder.Entity<Subgenre>().ToTable("subgenres");
             modelBuilder.Entity<Mood>().ToTable("moods");
-            modelBuilder.Entity<GptBatchUpdate>().ToTable("gpt_batch_updates");
+            modelBuilder.Entity<DiscoTransaction>().ToTable("disco_transactions");
 
             modelBuilder.Entity<AlbumArtist>().ToTable("album_artists");
             modelBuilder.Entity<AlbumGenre>().ToTable("album_genres");
@@ -132,62 +132,62 @@ namespace Api.Data
 
 
             // ***
-            // GptBatchUpdate Relationships
+            // DiscoTransaction Relationships
             // ***
 
-            // Album + GptBatchUpdate (one to many)
+            // Album + DiscoTransaction (one to many)
             modelBuilder.Entity<Album>()
-                .HasOne(a => a.GptBatchUpdate)
-                .WithMany(g => g.Albums)
-                .HasForeignKey(a => a.GptBatchUpdateId);
+                .HasOne(a => a.DiscoTransaction)
+                .WithMany(dt => dt.Albums)
+                .HasForeignKey(a => a.DiscoTransactionId);
 
-            // Artist + GptBatchUpdate (one to many)
+            // Artist + DiscoTransaction (one to many)
             modelBuilder.Entity<Artist>()
-                .HasOne(a => a.GptBatchUpdate)
-                .WithMany(g => g.Artists)
-                .HasForeignKey(a => a.GptBatchUpdateId);
+                .HasOne(a => a.DiscoTransaction)
+                .WithMany(dt => dt.Artists)
+                .HasForeignKey(a => a.DiscoTransactionId);
 
-            // Genre + GptBatchUpdate (one to many)
+            // Genre + DiscoTransaction (one to many)
             modelBuilder.Entity<Genre>()
-                .HasOne(g => g.GptBatchUpdate)
-                .WithMany(g => g.Genres)
-                .HasForeignKey(a => a.GptBatchUpdateId);
+                .HasOne(g => g.DiscoTransaction)
+                .WithMany(dt => dt.Genres)
+                .HasForeignKey(a => a.DiscoTransactionId);
 
-            // Mood + GptBatchUpdate (one to many)
+            // Mood + DiscoTransaction (one to many)
             modelBuilder.Entity<Mood>()
-                .HasOne(m => m.GptBatchUpdate)
-                .WithMany(g => g.Moods)
-                .HasForeignKey(a => a.GptBatchUpdateId);
+                .HasOne(m => m.DiscoTransaction)
+                .WithMany(dt => dt.Moods)
+                .HasForeignKey(a => a.DiscoTransactionId);
 
-            // Subgenre + GptBatchUpdate (one to many)
+            // Subgenre + DiscoTransaction (one to many)
             modelBuilder.Entity<Subgenre>()
-                .HasOne(s => s.GptBatchUpdate)
-                .WithMany(g => g.Subgenres)
-                .HasForeignKey(a => a.GptBatchUpdateId);
+                .HasOne(s => s.DiscoTransaction)
+                .WithMany(dt => dt.Subgenres)
+                .HasForeignKey(a => a.DiscoTransactionId);
 
-            // AlbumArtist + GptBatchUpdate (one to many)
+            // AlbumArtist + DiscoTransaction (one to many)
             modelBuilder.Entity<AlbumArtist>()
-                .HasOne(aa => aa.GptBatchUpdate)
-                .WithMany(g => g.AlbumArtists)
-                .HasForeignKey(aa => aa.GptBatchUpdateId);
+                .HasOne(aa => aa.DiscoTransaction)
+                .WithMany(dt => dt.AlbumArtists)
+                .HasForeignKey(aa => aa.DiscoTransactionId);
 
-            // AlbumGenre + GptBatchUpdate (one to many)
+            // AlbumGenre + DiscoTransaction (one to many)
             modelBuilder.Entity<AlbumGenre>()
-                .HasOne(ag => ag.GptBatchUpdate)
-                .WithMany(g => g.AlbumGenres)
-                .HasForeignKey(ag => ag.GptBatchUpdateId);
+                .HasOne(ag => ag.DiscoTransaction)
+                .WithMany(dt => dt.AlbumGenres)
+                .HasForeignKey(ag => ag.DiscoTransactionId);
 
-            // AlbumMood + GptBatchUpdate (one to many)
+            // AlbumMood + DiscoTransaction (one to many)
             modelBuilder.Entity<AlbumMood>()
-                .HasOne(am => am.GptBatchUpdate)
-                .WithMany(g => g.AlbumMoods)
-                .HasForeignKey(am => am.GptBatchUpdateId);
+                .HasOne(am => am.DiscoTransaction)
+                .WithMany(dt => dt.AlbumMoods)
+                .HasForeignKey(am => am.DiscoTransactionId);
 
-            // AlbumSubgenre + GptBatchUpdate (one to many)
+            // AlbumSubgenre + DiscoTransaction (one to many)
             modelBuilder.Entity<AlbumSubgenre>()
-                .HasOne(asg => asg.GptBatchUpdate)
-                .WithMany(g => g.AlbumSubgenres)
-                .HasForeignKey(asg => asg.GptBatchUpdateId);
+                .HasOne(asg => asg.DiscoTransaction)
+                .WithMany(dt => dt.AlbumSubgenres)
+                .HasForeignKey(asg => asg.DiscoTransactionId);
         }
     }    
 }

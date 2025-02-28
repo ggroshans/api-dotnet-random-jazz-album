@@ -21,7 +21,7 @@ namespace Api.Services
             _gptApiService = gptApiService;
         }
 
-        public async Task PopulateAlbumAsync(Guid gptBatchUpdateId, List<AlbumDto> albumDtos)
+        public async Task PopulateAlbumAsync(Guid discoTransactionId, List<AlbumDto> albumDtos)
         {
             foreach (var albumDto in albumDtos)
             {
@@ -36,7 +36,7 @@ namespace Api.Services
                     Description = albumDto.Description, 
                     PopularTracks = albumDto.PopularTracks,
                     AlbumTheme = albumDto.AlbumTheme,
-                    GptBatchUpdateId = gptBatchUpdateId,
+                    DiscoTransactionId = discoTransactionId,
                 };
 
                 _db.Albums.Add(album);
@@ -58,7 +58,7 @@ namespace Api.Services
                             ImageUrl = populatedArtist.ImageUrl,
                             PopularityScore = populatedArtist.PopularityScore,
                             SpotifyId = artistDto.SpotifyId,
-                            GptBatchUpdateId = gptBatchUpdateId,
+                            DiscoTransactionId = discoTransactionId,
                         };
                         _db.Artists.Add(existingArtist);
                         await _db.SaveChangesAsync();
@@ -71,7 +71,7 @@ namespace Api.Services
                         {
                             Album = album,
                             Artist = existingArtist,
-                            GptBatchUpdateId= gptBatchUpdateId,
+                            DiscoTransactionId = discoTransactionId,
                         });
                         await _db.SaveChangesAsync();
                     }
@@ -83,7 +83,7 @@ namespace Api.Services
                     existingGenre = new Genre
                     {
                         Name = StringUtils.CapitalizeAndFormat(albumDto.Genre),
-                        GptBatchUpdateId = gptBatchUpdateId
+                        DiscoTransactionId = discoTransactionId,
                     };
 
                     _db.Genres.Add(existingGenre);
@@ -96,7 +96,7 @@ namespace Api.Services
                     { 
                         Album = album,
                         Genre = existingGenre,
-                        GptBatchUpdateId = gptBatchUpdateId
+                        DiscoTransactionId = discoTransactionId,
                     });
                     await _db.SaveChangesAsync();
                 }
@@ -111,7 +111,7 @@ namespace Api.Services
                         existingMood = new Mood
                         {
                             Name = StringUtils.CapitalizeAndFormat(moodDto),
-                            GptBatchUpdateId = gptBatchUpdateId
+                            DiscoTransactionId = discoTransactionId,
                         };
 
                         _db.Moods.Add(existingMood);
@@ -125,7 +125,7 @@ namespace Api.Services
                         {
                             Album = album,
                             Mood = existingMood,
-                            GptBatchUpdateId = gptBatchUpdateId
+                            DiscoTransactionId = discoTransactionId,
                         });
                         await _db.SaveChangesAsync();
                     }
@@ -143,7 +143,7 @@ namespace Api.Services
                         {
                             Name = StringUtils.CapitalizeAndFormat(subgenreDto),
                             GenreId = existingGenre.Id,
-                            GptBatchUpdateId = gptBatchUpdateId
+                            DiscoTransactionId = discoTransactionId,
                         };
                         _db.Subgenres.Add(existingSubgenre);
                         await _db.SaveChangesAsync();
@@ -156,7 +156,7 @@ namespace Api.Services
                         {
                             Album = album,
                             Subgenre = existingSubgenre,
-                            GptBatchUpdateId = gptBatchUpdateId
+                            DiscoTransactionId = discoTransactionId,
                         });
                         await _db.SaveChangesAsync();
                     }

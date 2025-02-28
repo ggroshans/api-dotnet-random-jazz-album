@@ -20,7 +20,7 @@
         public List<AlbumGenre> AlbumGenres { get; set; } = new List<AlbumGenre>();
         public List<AlbumSubgenre>? AlbumSubgenres { get; set; } = new List<AlbumSubgenre>();
         public List<AlbumMood>? AlbumMoods { get; set; } = new List<AlbumMood>();
-        public Guid GptBatchUpdateId { get; set; }
-        public GptBatchUpdate GptBatchUpdate { get; set; }
+        public Guid DiscoTransactionId { get; set; }
+        public DiscoTransaction DiscoTransaction { get; set; }
     }
 }

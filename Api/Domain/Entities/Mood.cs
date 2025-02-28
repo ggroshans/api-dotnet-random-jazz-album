@@ -7,7 +7,7 @@
 
         // relationships
         public List<AlbumMood> AlbumMoods { get; set; } = new List<AlbumMood>();
-        public Guid GptBatchUpdateId { get; set; }
-        public GptBatchUpdate GptBatchUpdate { get; set; }
+        public Guid DiscoTransactionId { get; set; }
+        public DiscoTransaction DiscoTransaction { get; set; }
     }
 }
