@@ -29,6 +29,10 @@ namespace Api.Controllers
         public async Task<IActionResult> CreateAlbumsFromArtist([FromBody] AlbumRequestDto albumRequest)
         {
             var spotifyAlbums = await _spotifyApiService.GetSpotifyAlbums(albumRequest.ArtistName);
+            if (spotifyAlbums.Count == 0)
+            {
+                return NotFound("Zero Albums returned by spotify API");
+            }
             var (discoTransactionId, processedAlbums) = await _openAIservice.BatchProcessAlbums(spotifyAlbums, albumRequest.ArtistName);
             await _populateDbService.PopulateAlbumAsync(discoTransactionId, processedAlbums);
             return Ok(processedAlbums);
