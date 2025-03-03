@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Api.Utilities
 {
@@ -29,38 +31,40 @@ namespace Api.Utilities
 
         public static string CapitalizeAndFormat(string input)
         {
-            string formattedString = "";
-
-            if (input.Contains('-'))
+            if (string.IsNullOrEmpty(input)) 
             {
-                var splitString = input.Split('-');
-                List<string> capitalizedWords = new List<string>();
-                foreach (var item in splitString)
+                return input;
+            }
+
+            string[] words = Regex.Split(input, @"([- ])");
+
+            TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
+            string[] capitalizedWords = words.Select(word =>
+            {
+                if (word == "-" || word == " ") 
                 {
-                    var capitalizedWord = char.ToUpper(item[0]) + item.Substring(1).ToLower();
-                    capitalizedWords.Add(capitalizedWord);
+                    return word;
                 }
-                formattedString = string.Join(" ", capitalizedWords);
-            }
+                return textInfo.ToTitleCase(word.ToLower());
+            }).ToArray();
 
-            else if (input.Contains(' '))
+            return string.Concat(capitalizedWords); 
+        }
+
+        public static string NormalizeName(string name)
+        {
+            if (string.IsNullOrEmpty(name))
             {
-                var splitString = input.Split(' ');
-                List<string> capitalizedWords = new List<string>();
-                foreach (var item in splitString)
-                {
-                    var capitalizedWord = char.ToUpper(item[0]) + item.Substring(1).ToLower();
-                    capitalizedWords.Add(capitalizedWord);
-                }
-                formattedString = string.Join(" ", capitalizedWords);
+                return string.Empty; 
             }
+            string normalized = name.ToLower();
 
-            else if (!input.Contains('-') && !input.Contains(' '))
-            {
-                formattedString = char.ToUpper(input[0]) + input.Substring(1).ToLower();
-            }
+            normalized = Regex.Replace(normalized, @"[\s-]+", "-");
+            normalized = Regex.Replace(normalized, @"[^a-z0-9-]+", "");
+            normalized = Regex.Replace(normalized, @"^-+|-+$", "");
 
-            return formattedString;
+            return normalized;
         }
     }
 }
+
