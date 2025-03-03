@@ -25,27 +25,33 @@ namespace Api.Services
         {
             foreach (var albumDto in albumDtos)
             {
-                // -------- Overall Album --------
-                var album = new Album
-                {
-                    Name = StringUtils.CapitalizeAndFormat(albumDto.Name),
-                    ReleaseYear = albumDto.ReleaseYear,
-                    TotalTracks = albumDto.TotalTracks,
-                    ImageUrl = albumDto.ImageUrl,
-                    SpotifyId = albumDto.SpotifyId,
-                    Description = albumDto.Description, 
-                    PopularTracks = albumDto.PopularTracks,
-                    AlbumTheme = albumDto.AlbumTheme,
-                    DiscoTransactionId = discoTransactionId,
-                };
+                var dbAlbums = await _db.Albums.ToListAsync();
+                var existingAlbum = dbAlbums.FirstOrDefault(a => StringUtils.NormalizeName(a.Name) == StringUtils.NormalizeName(albumDto.Name));
 
-                _db.Albums.Add(album);
-                await _db.SaveChangesAsync();
+                if (existingAlbum == null)
+                {
+                    // -------- Overall Album --------
+                    existingAlbum = new Album
+                    {
+                        Name = StringUtils.CapitalizeAndFormat(albumDto.Name),
+                        ReleaseYear = albumDto.ReleaseYear,
+                        TotalTracks = albumDto.TotalTracks,
+                        ImageUrl = albumDto.ImageUrl,
+                        SpotifyId = albumDto.SpotifyId,
+                        Description = albumDto.Description, 
+                        PopularTracks = albumDto.PopularTracks,
+                        AlbumTheme = albumDto.AlbumTheme,
+                        DiscoTransactionId = discoTransactionId,
+                    };
+                    _db.Albums.Add(existingAlbum);
+                    _db.SaveChanges();
+                }
 
                 //  -------- Artist --------
                 foreach (var artistDto in albumDto.Artists)
                 {
-                    var existingArtist = await _db.Artists.FirstOrDefaultAsync(a => a.Name.ToLower() == artistDto.Name.ToLower()); 
+                    var dbArtists = await _db.Artists.ToListAsync();
+                    var existingArtist = dbArtists.FirstOrDefault(a => StringUtils.NormalizeName(a.Name) == StringUtils.NormalizeName(artistDto.Name)); 
 
                     if (existingArtist == null)
                     {
@@ -61,23 +67,24 @@ namespace Api.Services
                             DiscoTransactionId = discoTransactionId,
                         };
                         _db.Artists.Add(existingArtist);
-                        await _db.SaveChangesAsync();
+                        _db.SaveChanges();
                         
                     }
                     // ** Album Artist Junction Table **
-                    if (!await _db.AlbumArtists.AnyAsync(aa => aa.ArtistId == artistDto.Id && aa.AlbumId == album.Id))
+                    if (!await _db.AlbumArtists.AnyAsync(aa => aa.ArtistId == existingArtist.Id && aa.AlbumId == existingAlbum.Id))
                     {
                         _db.AlbumArtists.Add(new AlbumArtist
                         {
-                            Album = album,
+                            Album = existingAlbum,
                             Artist = existingArtist,
                             DiscoTransactionId = discoTransactionId,
                         });
-                        await _db.SaveChangesAsync();
+                        _db.SaveChanges();
                     }
                 }
                 // ------- Genre -------
-                var existingGenre = await _db.Genres.FirstOrDefaultAsync(g => g.Name.ToLower() == albumDto.Genre.ToLower());
+                var dbGenres = await _db.Genres.ToListAsync();
+                var existingGenre = dbGenres.FirstOrDefault(g => StringUtils.NormalizeName(g.Name) == StringUtils.NormalizeName(albumDto.Genre));
                 if (existingGenre == null)
                 {
                     existingGenre = new Genre
@@ -87,24 +94,25 @@ namespace Api.Services
                     };
 
                     _db.Genres.Add(existingGenre);
-                    await _db.SaveChangesAsync();
+                    _db.SaveChanges();
                 }
                 // ** Album Genre Junction Table **
-                if (!await _db.AlbumGenres.AnyAsync(ag => ag.GenreId == existingGenre.Id && ag.AlbumId == album.Id))
+                if (!await _db.AlbumGenres.AnyAsync(ag => ag.GenreId == existingGenre.Id && ag.AlbumId == existingAlbum.Id))
                 {
                     _db.AlbumGenres.Add(new AlbumGenre
                     { 
-                        Album = album,
+                        Album = existingAlbum,
                         Genre = existingGenre,
                         DiscoTransactionId = discoTransactionId,
                     });
-                    await _db.SaveChangesAsync();
+                    _db.SaveChanges();
                 }
 
                 // ------- Mood -------
                 foreach (var moodDto in albumDto.Moods)
                 {
-                    var existingMood = await _db.Moods.FirstOrDefaultAsync(m => m.Name.ToLower() == moodDto.ToLower());
+                    var dbMoods = await _db.Moods.ToListAsync();
+                    var existingMood = dbMoods.FirstOrDefault(m => StringUtils.NormalizeName(m.Name) == StringUtils.NormalizeName(moodDto));
                     
                     if (existingMood == null)
                     {
@@ -115,27 +123,27 @@ namespace Api.Services
                         };
 
                         _db.Moods.Add(existingMood);
-                        await _db.SaveChangesAsync();
+                        _db.SaveChanges();
                     }
 
                 // ** Album Mood Junction Table **
-                    if (!await _db.AlbumMoods.AnyAsync(am => am.MoodId == existingMood.Id && am.AlbumId == album.Id))
+                    if (!await _db.AlbumMoods.AnyAsync(am => am.MoodId == existingMood.Id && am.AlbumId == existingAlbum.Id))
                     {
                         _db.AlbumMoods.Add(new AlbumMood
                         {
-                            Album = album,
+                            Album = existingAlbum,
                             Mood = existingMood,
                             DiscoTransactionId = discoTransactionId,
                         });
-                        await _db.SaveChangesAsync();
+                        _db.SaveChanges();
                     }
                 }
 
                 // ------- Subgenres -------
                 foreach (var subgenreDto in albumDto.Subgenres)
                 {
-                    var existingSubgenre = _db.Subgenres.FirstOrDefault(sg => sg.Name.ToLower() == subgenreDto.ToLower());
-
+                    var dbSubgenres = await _db.Subgenres.ToListAsync();
+                    var existingSubgenre = dbSubgenres.FirstOrDefault(sg => StringUtils.NormalizeName(sg.Name) == StringUtils.NormalizeName(subgenreDto));
 
                     if (existingSubgenre == null)
                     {
@@ -146,19 +154,19 @@ namespace Api.Services
                             DiscoTransactionId = discoTransactionId,
                         };
                         _db.Subgenres.Add(existingSubgenre);
-                        await _db.SaveChangesAsync();
+                        _db.SaveChanges();
                     }
 
                 // ** Album Subgenre Junction Table **
-                    if (!await _db.AlbumSubgenres.AnyAsync(asg => asg.SubgenreId == existingSubgenre.Id && asg.AlbumId == album.Id))
+                    if (!await _db.AlbumSubgenres.AnyAsync(asg => asg.SubgenreId == existingSubgenre.Id && asg.AlbumId == existingAlbum.Id))
                     {
                         _db.AlbumSubgenres.Add(new AlbumSubgenre
                         {
-                            Album = album,
+                            Album = existingAlbum,
                             Subgenre = existingSubgenre,
                             DiscoTransactionId = discoTransactionId,
                         });
-                        await _db.SaveChangesAsync();
+                        _db.SaveChanges();
                     }
                 }
             }
