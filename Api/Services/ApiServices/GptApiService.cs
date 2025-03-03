@@ -52,11 +52,10 @@ namespace Api.Services.ApiServices
             //prompt.AppendLine("Genre: Funk, Subgenres: P-Funk, Funk Rock, Funk Metal, Funk Soul, G-Funk, Jazz-Funk, Electro-Funk, Afrobeat, Go-Go, Psychedelic Funk, Disco Funk, Minneapolis Sound, Boogie, Funk Pop, Latin Funk, New Orleans Funk, Experimental Funk, Neo-Funk, Rare Groove, Future Funk");
             prompt.AppendLine($"Albums: {string.Join(", ", albumNames)}");
 
-            discoTransaction.RequestDetails = prompt.ToString();
+            discoTransaction.RequestDetails = Convert.ToBase64String(Encoding.UTF8.GetBytes(prompt.ToString()));
             discoTransaction.ResponseStatusCode = 200;
             discoTransaction.ErrorMessage = null;
             
-
             try
             {
                 var chatCompletion = await _client.CompleteChatAsync(prompt.ToString());
@@ -90,7 +89,6 @@ namespace Api.Services.ApiServices
                                      PopularTracks = matchingGptAlbum.PopularTracks,
                                      AlbumTheme = matchingGptAlbum.AlbumTheme,
                                 };
-
                                 processedAlbums.Add(updatedAlbum);
                             }
                         }
@@ -121,7 +119,6 @@ namespace Api.Services.ApiServices
 
                     return (discoTransaction, new List<AlbumDto>(), true); 
                 }
-
                 return (discoTransaction, processedAlbums, false);
             }
             catch (Exception ex)
@@ -140,7 +137,6 @@ namespace Api.Services.ApiServices
         {
             ""biography"": { ""type"": ""string"" }, // artist/musician description or release notes (~500 characters)
         }";
-
                 var prompt = new StringBuilder();
                 prompt.AppendLine($"" +
                     $"For the artist/musician: {artist.Name}, return a json object using this schema,  " +
@@ -155,7 +151,6 @@ namespace Api.Services.ApiServices
                 {
                     try
                     {
-
                         var artistDetails = JsonConvert.DeserializeObject<ArtistDto>(responseContent);
 
                         if (artistDetails != null)
@@ -168,8 +163,7 @@ namespace Api.Services.ApiServices
                     {
                         Console.WriteLine($"JSON Parsing Error for artist {artist.Name}: {ex.Message}");
                     }
-                
-            }
+                }
             return artist;
         }
 
