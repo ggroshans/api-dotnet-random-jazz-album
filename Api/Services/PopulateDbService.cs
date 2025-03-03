@@ -21,7 +21,7 @@ namespace Api.Services
             _gptApiService = gptApiService;
         }
 
-        public async Task PopulateAlbumAsync(Guid discoTransactionId, List<AlbumDto> albumDtos)
+        public async Task PopulateAlbumAsync(DiscoTransaction discoTransaction, List<AlbumDto> albumDtos)
         {
             foreach (var albumDto in albumDtos)
             {
@@ -41,7 +41,7 @@ namespace Api.Services
                         Description = albumDto.Description, 
                         PopularTracks = albumDto.PopularTracks,
                         AlbumTheme = albumDto.AlbumTheme,
-                        DiscoTransactionId = discoTransactionId,
+                        DiscoTransactionId = discoTransaction.Id,
                     };
                     _db.Albums.Add(existingAlbum);
                     _db.SaveChanges();
@@ -64,7 +64,7 @@ namespace Api.Services
                             ImageUrl = populatedArtist.ImageUrl,
                             PopularityScore = populatedArtist.PopularityScore,
                             SpotifyId = artistDto.SpotifyId,
-                            DiscoTransactionId = discoTransactionId,
+                            DiscoTransactionId = discoTransaction.Id,
                         };
                         _db.Artists.Add(existingArtist);
                         _db.SaveChanges();
@@ -77,7 +77,7 @@ namespace Api.Services
                         {
                             Album = existingAlbum,
                             Artist = existingArtist,
-                            DiscoTransactionId = discoTransactionId,
+                            DiscoTransactionId = discoTransaction.Id,
                         });
                         _db.SaveChanges();
                     }
@@ -90,7 +90,7 @@ namespace Api.Services
                     existingGenre = new Genre
                     {
                         Name = StringUtils.CapitalizeAndFormat(albumDto.Genre),
-                        DiscoTransactionId = discoTransactionId,
+                        DiscoTransactionId = discoTransaction.Id,
                     };
 
                     _db.Genres.Add(existingGenre);
@@ -103,7 +103,7 @@ namespace Api.Services
                     { 
                         Album = existingAlbum,
                         Genre = existingGenre,
-                        DiscoTransactionId = discoTransactionId,
+                        DiscoTransactionId = discoTransaction.Id,
                     });
                     _db.SaveChanges();
                 }
@@ -119,7 +119,7 @@ namespace Api.Services
                         existingMood = new Mood
                         {
                             Name = StringUtils.CapitalizeAndFormat(moodDto),
-                            DiscoTransactionId = discoTransactionId,
+                            DiscoTransactionId = discoTransaction.Id,
                         };
 
                         _db.Moods.Add(existingMood);
@@ -133,7 +133,7 @@ namespace Api.Services
                         {
                             Album = existingAlbum,
                             Mood = existingMood,
-                            DiscoTransactionId = discoTransactionId,
+                            DiscoTransactionId = discoTransaction.Id,
                         });
                         _db.SaveChanges();
                     }
@@ -151,7 +151,7 @@ namespace Api.Services
                         {
                             Name = StringUtils.CapitalizeAndFormat(subgenreDto),
                             GenreId = existingGenre.Id,
-                            DiscoTransactionId = discoTransactionId,
+                            DiscoTransactionId = discoTransaction.Id,
                         };
                         _db.Subgenres.Add(existingSubgenre);
                         _db.SaveChanges();
@@ -164,7 +164,7 @@ namespace Api.Services
                         {
                             Album = existingAlbum,
                             Subgenre = existingSubgenre,
-                            DiscoTransactionId = discoTransactionId,
+                            DiscoTransactionId = discoTransaction.Id,
                         });
                         _db.SaveChanges();
                     }

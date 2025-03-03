@@ -29,12 +29,19 @@ namespace Api.Controllers
         public async Task<IActionResult> CreateAlbumsFromArtist([FromBody] AlbumRequestDto albumRequest)
         {
             var spotifyAlbums = await _spotifyApiService.GetSpotifyAlbums(albumRequest.ArtistName);
-            if (spotifyAlbums.Count == 0)
+            if (spotifyAlbums.Any())
             {
-                return NotFound("Zero Albums returned by spotify API");
+                return NotFound($"Could not find any albums by {albumRequest.ArtistName} on Spotify.");
             }
-            var (discoTransactionId, processedAlbums) = await _openAIservice.BatchProcessAlbums(spotifyAlbums, albumRequest.ArtistName);
-            await _populateDbService.PopulateAlbumAsync(discoTransactionId, processedAlbums);
+
+            var (discoTransaction, processedAlbums, batchError) = await _openAIservice.BatchProcessAlbums(spotifyAlbums, albumRequest.ArtistName);
+            if (batchError) 
+            {
+
+                return BadRequest($"Batch Error: {discoTransaction.ErrorMessage}"); 
+            }
+
+            await _populateDbService.PopulateAlbumAsync(discoTransaction, processedAlbums);
             return Ok(processedAlbums);
         }
     }

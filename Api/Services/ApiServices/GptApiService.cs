@@ -4,6 +4,7 @@ using System.Text;
 using Api.DTOs;
 using Api.Domain.Entities;
 using Api.Data;
+using System.Net;
 
 namespace Api.Services.ApiServices
 {
@@ -20,7 +21,7 @@ namespace Api.Services.ApiServices
             _dbContext = dbContext;
         }
 
-        public async Task<(DiscoTransaction, List<AlbumDto>)> GetGptAlbumDetails(List<AlbumDto> spotifyAlbums, string artistName, DiscoTransaction discoTransaction)
+        public async Task<(DiscoTransaction, List<AlbumDto>, bool)> GetGptAlbumDetails(List<AlbumDto> spotifyAlbums, string artistName, DiscoTransaction discoTransaction)
         {
             List<string> albumNames = new List<string>();
 
@@ -52,6 +53,9 @@ namespace Api.Services.ApiServices
             prompt.AppendLine($"Albums: {string.Join(", ", albumNames)}");
 
             discoTransaction.RequestDetails = prompt.ToString();
+            discoTransaction.ResponseStatusCode = 200;
+            discoTransaction.ErrorMessage = null;
+            
 
             try
             {
@@ -97,12 +101,16 @@ namespace Api.Services.ApiServices
                         Console.WriteLine($"GPT Response: {responseContent}");
                         discoTransaction.ErrorMessage = ex.Message;
                         discoTransaction.ResponseStatusCode = 500; 
+
+                        return (discoTransaction, new List<AlbumDto>(), true); 
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine($"Unexpected Exception: {ex.Message}");
                         discoTransaction.ErrorMessage = ex.Message;
                         discoTransaction.ResponseStatusCode = 500; 
+
+                        return (discoTransaction, new List<AlbumDto>(), true); 
                     }
                 }
                 else
@@ -110,9 +118,11 @@ namespace Api.Services.ApiServices
                     Console.WriteLine("GPT response data null");
                     discoTransaction.ErrorMessage = "GPT response data was null";
                     discoTransaction.ResponseStatusCode = 500; 
+
+                    return (discoTransaction, new List<AlbumDto>(), true); 
                 }
 
-                return (discoTransaction, processedAlbums);
+                return (discoTransaction, processedAlbums, false);
             }
             catch (Exception ex)
             {
@@ -120,10 +130,9 @@ namespace Api.Services.ApiServices
                 discoTransaction.ErrorMessage = ex.Message;
                 discoTransaction.ResponseStatusCode = 500; 
 
-                return (discoTransaction, new List<AlbumDto>()); 
+                return (discoTransaction, new List<AlbumDto>(), true); 
             }
         }
-
 
         public async Task<ArtistDto> GetGptArtistDetails(ArtistDto artist)
         {
@@ -164,33 +173,39 @@ namespace Api.Services.ApiServices
             return artist;
         }
 
-        public async Task<(Guid, List<AlbumDto>)> BatchProcessAlbums(List<AlbumDto> albums, string artistName)
+        public async Task<(DiscoTransaction, List<AlbumDto>, bool)> BatchProcessAlbums(List<AlbumDto> albums, string artistName)
         {
             var discoTransaction = new DiscoTransaction
             {
-                Id = new Guid()
+                Id = new Guid(),
+                TimeStamp = DateTime.UtcNow
             };
 
             List<AlbumDto> unprocessedAlbums = albums;
+            List<AlbumDto> gptAlbums = new List<AlbumDto>();
             List<AlbumDto> processedAlbums = new List<AlbumDto>();
             var albumCount = albums.Count;
+            bool batchError = false;
            
             while (unprocessedAlbums.Count > 0)
             {
                 var batchSize = Math.Min(20, unprocessedAlbums.Count);
                 var albumsBatch = unprocessedAlbums.Take(batchSize).ToList();
-                var (discoTransactionResponse, gptAlbums) = await GetGptAlbumDetails(albumsBatch, artistName, discoTransaction);
+                (discoTransaction, gptAlbums, batchError) = await GetGptAlbumDetails(albumsBatch, artistName, discoTransaction);
 
-                discoTransaction = discoTransactionResponse;
+                if (batchError == true)
+                {
+                    break;
+                }
+
                 processedAlbums.AddRange(gptAlbums);
-
                 unprocessedAlbums = unprocessedAlbums.Skip(batchSize).ToList();
             }
 
             await _dbContext.DiscoTransactions.AddAsync(discoTransaction);
             await _dbContext.SaveChangesAsync();
 
-            return (discoTransaction.Id, processedAlbums);
+            return (discoTransaction, processedAlbums, batchError);
         }
     }
 }
