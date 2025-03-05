@@ -2,7 +2,7 @@
 using Api.Services.ApiServices;
 using Api.Services;
 using Api.Services.ApiServices.Spotify;
-using Api.DTOs;
+using Api.Models.DTOs;
 
 namespace Api.Controllers
 {
@@ -29,7 +29,7 @@ namespace Api.Controllers
         public async Task<IActionResult> CreateAlbumsFromArtist([FromBody] AlbumRequestDto albumRequest)
         {
             var spotifyAlbums = await _spotifyApiService.GetSpotifyAlbums(albumRequest.ArtistName);
-            if (spotifyAlbums.Any())
+            if (!spotifyAlbums.Any())
             {
                 return NotFound($"Could not find any albums by {albumRequest.ArtistName} on Spotify.");
             }
