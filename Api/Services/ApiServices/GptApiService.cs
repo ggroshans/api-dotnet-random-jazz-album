@@ -1,10 +1,10 @@
 ﻿using Newtonsoft.Json;
 using OpenAI.Chat;
 using System.Text;
-using Api.DTOs;
 using Api.Domain.Entities;
 using Api.Data;
-using System.Net;
+using Api.Models.DTOs;
+using Api.Models;
 
 namespace Api.Services.ApiServices
 {
@@ -52,7 +52,7 @@ namespace Api.Services.ApiServices
             //prompt.AppendLine("Genre: Funk, Subgenres: P-Funk, Funk Rock, Funk Metal, Funk Soul, G-Funk, Jazz-Funk, Electro-Funk, Afrobeat, Go-Go, Psychedelic Funk, Disco Funk, Minneapolis Sound, Boogie, Funk Pop, Latin Funk, New Orleans Funk, Experimental Funk, Neo-Funk, Rare Groove, Future Funk");
             prompt.AppendLine($"Albums: {string.Join(", ", albumNames)}");
 
-            discoTransaction.RequestDetails = Convert.ToBase64String(Encoding.UTF8.GetBytes(prompt.ToString()));
+  
             discoTransaction.ResponseStatusCode = 200;
             discoTransaction.ErrorMessage = null;
             
@@ -174,6 +174,12 @@ namespace Api.Services.ApiServices
                 Id = new Guid(),
                 TimeStamp = DateTime.UtcNow
             };
+            var requestDetails = new RequestDetails
+            {
+                PrimaryArtistName = artistName,
+            };
+
+            discoTransaction.RequestDetails = JsonConvert.SerializeObject(requestDetails);
 
             List<AlbumDto> unprocessedAlbums = albums;
             List<AlbumDto> gptAlbums = new List<AlbumDto>();
