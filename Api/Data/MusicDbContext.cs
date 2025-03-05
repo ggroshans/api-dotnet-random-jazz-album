@@ -16,7 +16,6 @@ namespace Api.Data
 
         // Junction tables for many-to-many
         public DbSet<AlbumArtist> AlbumArtists { get; set; }
-        public DbSet<AlbumGenre> AlbumGenres { get; set; }
         public DbSet<AlbumSubgenre> AlbumSubgenres { get; set; }
         public DbSet<AlbumMood> AlbumMoods { get; set; }
 
@@ -64,7 +63,6 @@ namespace Api.Data
             modelBuilder.Entity<DiscoTransaction>().ToTable("disco_transactions");
 
             modelBuilder.Entity<AlbumArtist>().ToTable("album_artists");
-            modelBuilder.Entity<AlbumGenre>().ToTable("album_genres");
             modelBuilder.Entity<AlbumSubgenre>().ToTable("album_subgenres");
             modelBuilder.Entity<AlbumMood>().ToTable("album_moods");
 
@@ -81,20 +79,6 @@ namespace Api.Data
                 .HasOne(aa => aa.Artist)
                 .WithMany(a => a.AlbumArtists)
                 .HasForeignKey(aa => aa.ArtistId);
-
-            // Album + Genre (many to many)
-            modelBuilder.Entity<AlbumGenre>()
-                .HasKey(ag => new { ag.AlbumId, ag.GenreId });
-
-            modelBuilder.Entity<AlbumGenre>()
-                .HasOne(ag => ag.Album)
-                .WithMany(ag => ag.AlbumGenres)
-                .HasForeignKey(ag => ag.AlbumId);
-
-            modelBuilder.Entity<AlbumGenre>()
-                .HasOne(ag => ag.Genre)
-                .WithMany(ag => ag.AlbumGenres)
-                .HasForeignKey(ag => ag.GenreId);
 
             // Album + Subgenre (many to many)
             modelBuilder.Entity<AlbumSubgenre>()
@@ -124,12 +108,17 @@ namespace Api.Data
                 .WithMany(m => m.AlbumMoods)
                 .HasForeignKey(am => am.MoodId);
 
+            // Album + Genre (one to many)
+            modelBuilder.Entity<Album>()
+                .HasOne(a => a.Genre)
+                .WithMany(g => g.Albums)
+                .HasForeignKey(a => a.GenreId);
+
             // Genre + Subgenre (one to many)
             modelBuilder.Entity<Subgenre>()
                 .HasOne(s => s.Genre)
                 .WithMany(g => g.Subgenres)
                 .HasForeignKey(s => s.GenreId);
-
 
             // ***
             // DiscoTransaction Relationships
@@ -170,12 +159,6 @@ namespace Api.Data
                 .HasOne(aa => aa.DiscoTransaction)
                 .WithMany(dt => dt.AlbumArtists)
                 .HasForeignKey(aa => aa.DiscoTransactionId);
-
-            // AlbumGenre + DiscoTransaction (one to many)
-            modelBuilder.Entity<AlbumGenre>()
-                .HasOne(ag => ag.DiscoTransaction)
-                .WithMany(dt => dt.AlbumGenres)
-                .HasForeignKey(ag => ag.DiscoTransactionId);
 
             // AlbumMood + DiscoTransaction (one to many)
             modelBuilder.Entity<AlbumMood>()
