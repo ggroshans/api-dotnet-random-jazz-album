@@ -15,11 +15,13 @@
         public string? AlbumTheme { get; set; }
         public List<string>? PopularTracks { get; set; }
 
+
         // relationships
         public List<AlbumArtist> AlbumArtists { get; set; } = new List<AlbumArtist>();
-        public List<AlbumGenre> AlbumGenres { get; set; } = new List<AlbumGenre>();
         public List<AlbumSubgenre>? AlbumSubgenres { get; set; } = new List<AlbumSubgenre>();
         public List<AlbumMood>? AlbumMoods { get; set; } = new List<AlbumMood>();
+        public int GenreId { get; set; }
+        public Genre Genre { get; set; }
         public Guid DiscoTransactionId { get; set; }
         public DiscoTransaction DiscoTransaction { get; set; }
     }

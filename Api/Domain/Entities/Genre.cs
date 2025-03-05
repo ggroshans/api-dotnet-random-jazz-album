@@ -7,7 +7,7 @@
 
         // relationships
         public List<Subgenre> Subgenres { get; set; } = new List<Subgenre>();
-        public List<AlbumGenre> AlbumGenres { get; set; } = new List<AlbumGenre>();
+        public List<Album> Albums { get; set; } = new List<Album>();
         public Guid DiscoTransactionId { get; set; }
         public DiscoTransaction DiscoTransaction { get; set; }
     }

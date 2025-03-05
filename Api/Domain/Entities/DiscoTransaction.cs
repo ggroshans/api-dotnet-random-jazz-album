@@ -15,7 +15,6 @@
             public List<Subgenre> Subgenres { get; set; } = new List<Subgenre>();
             public List<Mood> Moods { get; set; } = new List<Mood>();
             public List<AlbumArtist> AlbumArtists { get; set; } = new List<AlbumArtist>();
-            public List<AlbumGenre> AlbumGenres { get; set; } = new List<AlbumGenre>();
             public List<AlbumMood> AlbumMoods { get; set; } = new List<AlbumMood>();
             public List<AlbumSubgenre> AlbumSubgenres { get; set; } = new List<AlbumSubgenre>();
         }
