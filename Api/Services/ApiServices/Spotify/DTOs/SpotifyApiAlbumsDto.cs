@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 
-namespace Api.Services.ApiServices.Spotify
+namespace Api.Services.ApiServices.Spotify.DTOs
 {
-    public class SpotifyAlbumsApiResponse
+    public class SpotifyApiAlbumsDto
     {
         public SpotifyAlbumsResponseData Albums { get; set; }
     }
@@ -45,7 +45,7 @@ namespace Api.Services.ApiServices.Spotify
     {
         public string Id { get; set; }
         public string Name { get; set; }
-   }
+    }
 
     public class SpotifyImage
     {
@@ -69,6 +69,6 @@ namespace Api.Services.ApiServices.Spotify
 
         [JsonProperty("popularity")]
         public int PopularityScore { get; set; }
-        
+
     }
 }

@@ -5,8 +5,8 @@ using Api.Services.ApiServices.Spotify;
 using Api.Domain.Entities;
 using Api.Utilities;
 using Newtonsoft.Json;
-using Api.Models.DTOs;
 using Api.Models;
+using Api.Models.DTOs.InternalDTOs;
 
 namespace Api.Services
 {
@@ -23,7 +23,7 @@ namespace Api.Services
             _gptApiService = gptApiService;
         }
 
-        public async Task PopulateAlbumAsync(DiscoTransaction discoTransaction, List<AlbumDto> albumDtos)
+        public async Task PopulateAlbumAsync(DiscoTransaction discoTransaction, List<AlbumProcessingDto> albumDtos)
         {
 
             RequestDetails requestDetails = JsonConvert.DeserializeObject<RequestDetails>(discoTransaction.RequestDetails) ?? new RequestDetails();
@@ -65,6 +65,8 @@ namespace Api.Services
                         Description = albumDto.Description, 
                         PopularTracks = albumDto.PopularTracks,
                         AlbumTheme = albumDto.AlbumTheme,
+                        Label = albumDto.Label,
+                        PopularityScore = albumDto.PopularityScore,
                         GenreId = existingGenre.Id,
                         DiscoTransactionId = discoTransaction.Id,
                     };
@@ -189,7 +191,7 @@ namespace Api.Services
             }
         }
 
-        public async Task<ArtistDto> GetArtistDetailsAsync(ArtistDto artist)
+        public async Task<ArtistProcessingDto> GetArtistDetailsAsync(ArtistProcessingDto artist)
         {
             var spotifyArtist = await _spotifyApiService.GetSpotifyArtist(artist);
             var gptArtist = await _gptApiService.GetGptArtistDetails(spotifyArtist);

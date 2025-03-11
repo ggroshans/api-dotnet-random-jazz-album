@@ -3,8 +3,9 @@ using OpenAI.Chat;
 using System.Text;
 using Api.Domain.Entities;
 using Api.Data;
-using Api.Models.DTOs;
 using Api.Models;
+using Api.Utilities;
+using Api.Models.DTOs.InternalDTOs;
 
 namespace Api.Services.ApiServices
 {
@@ -21,7 +22,7 @@ namespace Api.Services.ApiServices
             _dbContext = dbContext;
         }
 
-        public async Task<(DiscoTransaction, List<AlbumDto>, bool)> GetGptAlbumDetails(List<AlbumDto> spotifyAlbums, string artistName, DiscoTransaction discoTransaction)
+        public async Task<(DiscoTransaction, List<AlbumProcessingDto>, bool)> GetGptAlbumDetails(List<AlbumProcessingDto> spotifyAlbums, string artistName, DiscoTransaction discoTransaction)
         {
             List<string> albumNames = new List<string>();
 
@@ -60,13 +61,13 @@ namespace Api.Services.ApiServices
             {
                 var chatCompletion = await _client.CompleteChatAsync(prompt.ToString());
                 var responseContent = chatCompletion?.Value.Content[0].Text;
-                var processedAlbums = new List<AlbumDto>();
+                var processedAlbums = new List<AlbumProcessingDto>();
 
                 if (!string.IsNullOrEmpty(responseContent))
                 {
                     try
                     {
-                        var gptAlbums = JsonConvert.DeserializeObject<List<AlbumDto>>(responseContent);
+                        var gptAlbums = JsonConvert.DeserializeObject<List<AlbumProcessingDto>>(responseContent);
                         
                         foreach (var spotifyAlbum in spotifyAlbums)
                         {
@@ -74,7 +75,7 @@ namespace Api.Services.ApiServices
                             
                             if (matchingGptAlbum != null)
                             {
-                                var updatedAlbum = new AlbumDto
+                                var updatedAlbum = new AlbumProcessingDto
                                 {
                                      Name = spotifyAlbum.Name,
                                      Artists = spotifyAlbum.Artists,
@@ -82,6 +83,8 @@ namespace Api.Services.ApiServices
                                      TotalTracks = spotifyAlbum.TotalTracks,
                                      ImageUrl = spotifyAlbum.ImageUrl,
                                      SpotifyId = spotifyAlbum.SpotifyId,
+                                     Label = spotifyAlbum.Label,
+                                     PopularityScore = spotifyAlbum.PopularityScore,
                                      Description = matchingGptAlbum.Description,
                                      Genre = matchingGptAlbum.Genre,
                                      Subgenres = matchingGptAlbum.Subgenres,
@@ -100,7 +103,7 @@ namespace Api.Services.ApiServices
                         discoTransaction.ErrorMessage = ex.Message;
                         discoTransaction.ResponseStatusCode = 500; 
 
-                        return (discoTransaction, new List<AlbumDto>(), true); 
+                        return (discoTransaction, new List<AlbumProcessingDto>(), true); 
                     }
                     catch (Exception ex)
                     {
@@ -108,7 +111,7 @@ namespace Api.Services.ApiServices
                         discoTransaction.ErrorMessage = ex.Message;
                         discoTransaction.ResponseStatusCode = 500; 
 
-                        return (discoTransaction, new List<AlbumDto>(), true); 
+                        return (discoTransaction, new List<AlbumProcessingDto>(), true); 
                     }
                 }
                 else
@@ -117,7 +120,7 @@ namespace Api.Services.ApiServices
                     discoTransaction.ErrorMessage = "GPT response data was null";
                     discoTransaction.ResponseStatusCode = 500; 
 
-                    return (discoTransaction, new List<AlbumDto>(), true); 
+                    return (discoTransaction, new List<AlbumProcessingDto>(), true); 
                 }
                 return (discoTransaction, processedAlbums, false);
             }
@@ -127,11 +130,11 @@ namespace Api.Services.ApiServices
                 discoTransaction.ErrorMessage = ex.Message;
                 discoTransaction.ResponseStatusCode = 500; 
 
-                return (discoTransaction, new List<AlbumDto>(), true); 
+                return (discoTransaction, new List<AlbumProcessingDto>(), true); 
             }
         }
 
-        public async Task<ArtistDto> GetGptArtistDetails(ArtistDto artist)
+        public async Task<ArtistProcessingDto> GetGptArtistDetails(ArtistProcessingDto artist)
         {
             string schema = @"
         {
@@ -151,7 +154,7 @@ namespace Api.Services.ApiServices
                 {
                     try
                     {
-                        var artistDetails = JsonConvert.DeserializeObject<ArtistDto>(responseContent);
+                        var artistDetails = JsonConvert.DeserializeObject<ArtistProcessingDto>(responseContent);
 
                         if (artistDetails != null)
                         {
@@ -167,7 +170,7 @@ namespace Api.Services.ApiServices
             return artist;
         }
 
-        public async Task<(DiscoTransaction, List<AlbumDto>, bool)> BatchProcessAlbums(List<AlbumDto> albums, string artistName)
+        public async Task<(DiscoTransaction, List<AlbumProcessingDto>, bool)> BatchProcessAlbums(List<AlbumProcessingDto> albums, string artistName)
         {
             var discoTransaction = new DiscoTransaction
             {
@@ -176,14 +179,14 @@ namespace Api.Services.ApiServices
             };
             var requestDetails = new RequestDetails
             {
-                PrimaryArtistName = artistName,
+                PrimaryArtistName = StringUtils.CapitalizeAndFormat(artistName),
             };
 
             discoTransaction.RequestDetails = JsonConvert.SerializeObject(requestDetails);
 
-            List<AlbumDto> unprocessedAlbums = albums;
-            List<AlbumDto> gptAlbums = new List<AlbumDto>();
-            List<AlbumDto> processedAlbums = new List<AlbumDto>();
+            List<AlbumProcessingDto> unprocessedAlbums = albums;
+            List<AlbumProcessingDto> gptAlbums = new List<AlbumProcessingDto>();
+            List<AlbumProcessingDto> processedAlbums = new List<AlbumProcessingDto>();
             var albumCount = albums.Count;
             bool batchError = false;
            
