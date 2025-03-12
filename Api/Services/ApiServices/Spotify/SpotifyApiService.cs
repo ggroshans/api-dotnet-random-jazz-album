@@ -71,7 +71,7 @@ namespace Api.Services.ApiServices.Spotify
 
                     foreach (var album in spotifyAlbums)
                     {
-                        if (!processedAlbums.Any(x => x.Name.Equals(album.Name, StringComparison.OrdinalIgnoreCase)))
+                        if (!processedAlbums.Any(x => x.Title.Equals(album.Name, StringComparison.OrdinalIgnoreCase)))
                         {
                             var filteredAlbum = FilterAlbumProperties(album, artistName);
 
@@ -112,7 +112,7 @@ namespace Api.Services.ApiServices.Spotify
 
             filteredAlbum = new AlbumProcessingDto()
             {
-                Name = album.Name,
+                Title = album.Name,
                 Artists = artists,
                 ReleaseYear = album.ReleaseDate.Substring(0, 4),
                 TotalTracks = album.TotalTracks,

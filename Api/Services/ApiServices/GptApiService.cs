@@ -28,12 +28,12 @@ namespace Api.Services.ApiServices
 
             foreach (var album in spotifyAlbums)
             {
-                albumNames.Add(album.Name);
+                albumNames.Add(album.Title);
             }
 
             string schema = @"
     {
-        ""name"": { ""type"": ""string""},
+        ""title"": { ""type"": ""string""},
         ""description"": { ""type"": ""string"" }, // album description or release notes (~500 characters)
         ""genre"": { ""type"": ""string"" }, // primary music genre (Only option is jazz)
         ""subgenres"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } }, // list of subgenres
@@ -71,13 +71,13 @@ namespace Api.Services.ApiServices
                         
                         foreach (var spotifyAlbum in spotifyAlbums)
                         {
-                            var matchingGptAlbum = gptAlbums.Where(g => g.Name == spotifyAlbum.Name).FirstOrDefault();
+                            var matchingGptAlbum = gptAlbums.Where(g => g.Title == spotifyAlbum.Title).FirstOrDefault();
                             
                             if (matchingGptAlbum != null)
                             {
                                 var updatedAlbum = new AlbumProcessingDto
                                 {
-                                     Name = spotifyAlbum.Name,
+                                     Title = spotifyAlbum.Title,
                                      Artists = spotifyAlbum.Artists,
                                      ReleaseYear = spotifyAlbum.ReleaseYear,
                                      TotalTracks = spotifyAlbum.TotalTracks,

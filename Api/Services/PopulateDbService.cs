@@ -50,14 +50,14 @@ namespace Api.Services
 
                 // -------- Overall Album --------
                 var dbAlbums = await _db.Albums.ToListAsync();
-                var existingAlbum = dbAlbums.FirstOrDefault(a => StringUtils.NormalizeName(a.Name) == StringUtils.NormalizeName(albumDto.Name));
+                var existingAlbum = dbAlbums.FirstOrDefault(a => StringUtils.NormalizeName(a.Title) == StringUtils.NormalizeName(albumDto.Title));
 
                 if (existingAlbum == null)
                 {
                     requestDetails.AlbumCount += 1;
                     existingAlbum = new Album
                     {
-                        Name = StringUtils.CapitalizeAndFormat(albumDto.Name),
+                        Title = StringUtils.CapitalizeAndFormat(albumDto.Title),
                         ReleaseYear = albumDto.ReleaseYear,
                         TotalTracks = albumDto.TotalTracks,
                         ImageUrl = albumDto.ImageUrl,

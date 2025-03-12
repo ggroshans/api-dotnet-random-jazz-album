@@ -69,14 +69,14 @@ namespace Api.Controllers
             var album = new AlbumResponseDto
             {
                 Id = randomAlbum.Id,
-                Name = randomAlbum.Name,
+                Title = randomAlbum.Title,
                 Description = randomAlbum.Description,
                 Genre = new GenreResponseDto 
                 { 
                     Id = randomAlbum.Genre.Id, 
                     Name = randomAlbum.Genre.Name 
                 },
-                AlbumTheme = randomAlbum.AlbumTheme,
+                Theme = randomAlbum.AlbumTheme,
                 ImageUrl = randomAlbum.ImageUrl,
                 Label = randomAlbum.Label,
                 PopularityScore = randomAlbum.PopularityScore,

@@ -3,10 +3,10 @@
     public class AlbumResponseDto
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string Title { get; set; }
         public string Description { get; set; }
         public GenreResponseDto Genre { get; set; }
-        public string AlbumTheme { get; set; }
+        public string Theme { get; set; }
         public string ImageUrl { get; set; }
         public string Label { get; set; }
         public int PopularityScore { get; set; }

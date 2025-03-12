@@ -4,7 +4,7 @@
     {
         //spotify fields
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string Title { get; set; }
         public string ReleaseYear { get; set; }
         public int TotalTracks { get; set; }
         public string ImageUrl { get; set; }

@@ -6,7 +6,7 @@ namespace Api.Models.DTOs.InternalDTOs
     {
         //spotify fields
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string Title { get; set; }
         public List<ArtistProcessingDto> Artists { get; set; }
         public string ReleaseYear { get; set; }
         public int TotalTracks { get; set; }
