@@ -8,6 +8,7 @@
         public List<string>? Genres { get; set; }
         public string? ImageUrl { get; set; }
         public int PopularityScore { get; set; }
+        public int? NormalizedScore { get; set; }
         public string SpotifyId { get; set; }
 
         //gpt fields
