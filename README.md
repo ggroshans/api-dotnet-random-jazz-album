@@ -1,5 +1,9 @@
 # random-album-api
 
+Interesting Issues:
+  - After populating 8 tables, needed to easily reverse data from one populating transaction (an artist's discography) => table that links the transaction with a GUID that's a foreign key to other tables
+  - For Jazz, Spotify's API generally returned low popularity scores for albums / artists due to their relative popularity to mainstream artists => created endpoint for running through all existing albums in albums Table and creates a percentile score relative to other jazz albums
+
 Current JSON for Album seeding
 ```json
 {
