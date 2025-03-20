@@ -10,7 +10,7 @@
         public string ImageUrl { get; set; }
         public string Label { get; set; }
         public int PopularityScore { get; set; }
-        public int? NormalizedScore { get; set; }
+        public double? PercentileScore { get; set; }
         public List<string> PopularTracks { get; set; }
         public string ReleaseYear { get; set; }
         public int TotalTracks { get; set; }
