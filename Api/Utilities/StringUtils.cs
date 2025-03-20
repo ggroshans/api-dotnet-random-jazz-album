@@ -65,6 +65,40 @@ namespace Api.Utilities
 
             return normalized;
         }
+
+        public static string CapitalizeSentences(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return input;
+            }
+
+            string[] sentences = Regex.Split(input, @"(?<=[.!?])\s+");
+            StringBuilder result = new StringBuilder();
+
+            foreach (string sentence in sentences)
+            {
+                if (sentence.Length == 0)
+                {
+                    continue;
+                }
+
+                string trimmedSentence = sentence.Trim();
+                if (trimmedSentence.Length == 0)
+                {
+                    continue;
+                }
+
+                result.Append(char.ToUpper(trimmedSentence[0]));
+                if (trimmedSentence.Length > 1)
+                {
+                    result.Append(trimmedSentence.Substring(1).ToLower());
+                }
+
+                result.Append(" "); 
+            }
+            return result.ToString().TrimEnd(); 
+        }
     }
 }
 

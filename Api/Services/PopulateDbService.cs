@@ -62,9 +62,9 @@ namespace Api.Services
                         TotalTracks = albumDto.TotalTracks,
                         ImageUrl = albumDto.ImageUrl,
                         SpotifyId = albumDto.SpotifyId,
-                        Description = StringUtils.CapitalizeAndFormat(albumDto.Description), 
+                        Description = StringUtils.CapitalizeSentences(albumDto.Description), 
                         PopularTracks = albumDto.PopularTracks,
-                        AlbumTheme = StringUtils.CapitalizeAndFormat(albumDto.AlbumTheme),
+                        AlbumTheme = StringUtils.CapitalizeSentences(albumDto.AlbumTheme),
                         Label = StringUtils.CapitalizeAndFormat(albumDto.Label),
                         PopularityScore = albumDto.PopularityScore,
                         GenreId = existingGenre.Id,
@@ -88,7 +88,7 @@ namespace Api.Services
                         existingArtist = new Artist
                         {
                             Name = StringUtils.CapitalizeAndFormat(artistDto.Name),
-                            Biography = StringUtils.CapitalizeAndFormat(populatedArtist.Biography),
+                            Biography = StringUtils.CapitalizeSentences(populatedArtist.Biography),
                             Genres = populatedArtist.Genres,
                             ImageUrl = populatedArtist.ImageUrl,
                             PopularityScore = populatedArtist.PopularityScore,
