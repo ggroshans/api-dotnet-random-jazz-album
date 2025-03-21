@@ -12,5 +12,6 @@
 
         //gpt fields
         public string Biography { get; set; }
+        public string Instrument { get; set; }
     }
 }

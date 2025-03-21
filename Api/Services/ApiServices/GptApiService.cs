@@ -139,6 +139,7 @@ namespace Api.Services.ApiServices
             string schema = @"
         {
             ""biography"": { ""type"": ""string"" }, // artist/musician description or release notes (~500 characters)
+            ""instrument"": { ""type"": ""string"" }, // the main instrument this artist/musician plays. If it's a band/group then return group
         }";
                 var prompt = new StringBuilder();
                 prompt.AppendLine($"" +
@@ -159,6 +160,7 @@ namespace Api.Services.ApiServices
                         if (artistDetails != null)
                         {
                             artist.Biography = artistDetails.Biography;
+                            artist.Instrument = artistDetails.Instrument;
                         }
                     }
 

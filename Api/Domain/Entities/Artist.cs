@@ -13,6 +13,7 @@
 
         //gpt fields
         public string Biography { get; set; }
+        public string Instrument { get; set; }
 
         //relationships
         public List<AlbumArtist> AlbumArtists { get; set; } = new List<AlbumArtist>();

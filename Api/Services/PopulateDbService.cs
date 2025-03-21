@@ -89,6 +89,7 @@ namespace Api.Services
                         {
                             Name = StringUtils.CapitalizeAndFormat(artistDto.Name),
                             Biography = StringUtils.CapitalizeSentences(populatedArtist.Biography),
+                            Instrument = StringUtils.CapitalizeAndFormat(populatedArtist.Instrument),
                             Genres = populatedArtist.Genres,
                             ImageUrl = populatedArtist.ImageUrl,
                             PopularityScore = populatedArtist.PopularityScore,
