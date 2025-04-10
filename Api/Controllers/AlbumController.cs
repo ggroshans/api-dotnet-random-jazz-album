@@ -50,28 +50,6 @@ namespace Api.Controllers
             return Ok(processedAlbums);
         }
 
-        [HttpGet("normalize-album-scores")]
-        public async Task<ActionResult> NormalizeAlbumPopularityScores()
-        {
-            var albums = _dbContext.Albums.ToList();
-
-            if (albums.Count == 0)
-            {
-                return Ok("Error retrieving albums.");
-            }
-
-            foreach (var album in albums)
-            {
-                var lower = albums.Count(a => a.PopularityScore < album.PopularityScore);
-                var percentile = Math.Round((double)lower / albums.Count * 100, 0);
-
-                album.PercentileScore = percentile;
-            }
-            _dbContext.SaveChanges();
-            return Ok("Scores normalized");
-        }
-
-
         [HttpGet("random-album")]
         public async Task<IActionResult> GetRandomAlbum()
         {
