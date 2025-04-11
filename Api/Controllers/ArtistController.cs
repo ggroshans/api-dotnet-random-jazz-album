@@ -3,6 +3,8 @@ using Api.Services.ApiServices;
 using Api.Services;
 using Api.Services.ApiServices.Spotify;
 using Api.Data;
+using Microsoft.EntityFrameworkCore;
+using Api.Domain.Entities;
 
 namespace Api.Controllers
 {
@@ -26,5 +28,18 @@ namespace Api.Controllers
             _populateDbService = populateDbService;
             _dbContext = dbContext;
         }
+
+        [HttpGet("get-artist")]
+        public async Task<IActionResult> getArtist(int artistId)
+        {
+            var artist =  await _dbContext.Artists.FirstOrDefaultAsync(a => a.Id == artistId);
+
+            if (artist == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(artist);
+        }
     }
-}
+} 
