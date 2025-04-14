@@ -61,18 +61,18 @@ namespace Api.Controllers
                     .ThenInclude(am => am.Mood)
                 .Include(a => a.AlbumSubgenres)
                     .ThenInclude(asg => asg.Subgenre)
-                .OrderBy(a => Guid.NewGuid())
-                .FirstOrDefaultAsync();
+                .OrderBy(a => Guid.NewGuid()).FirstOrDefaultAsync();
 
+ 
             var album = new AlbumResponseDto
             {
                 Id = randomAlbum.Id,
                 Title = randomAlbum.Title,
                 Description = randomAlbum.Description,
-                Genre = new GenreResponseDto 
-                { 
-                    Id = randomAlbum.Genre.Id, 
-                    Name = randomAlbum.Genre.Name 
+                Genre = new GenreResponseDto
+                {
+                    Id = randomAlbum.Genre.Id,
+                    Name = randomAlbum.Genre.Name
                 },
                 Theme = randomAlbum.AlbumTheme,
                 ImageUrl = randomAlbum.ImageUrl,
@@ -83,26 +83,26 @@ namespace Api.Controllers
                 ReleaseYear = randomAlbum.ReleaseYear,
                 TotalTracks = randomAlbum.TotalTracks,
                 Artists = randomAlbum.AlbumArtists.Select(aa => new ArtistResponseDto
-                    {
-                        Id = aa.Artist.Id,
-                        Name = aa.Artist.Name,
-                        Biography = aa.Artist.Biography,
-                        Genres = aa.Artist.Genres,
-                        ImageUrl = aa.Artist.ImageUrl,
-                        PopularityScore = aa.Artist.PopularityScore,
-                        PercentileScore = aa.Artist.PercentileScore
-                    }
+                {
+                    Id = aa.Artist.Id,
+                    Name = aa.Artist.Name,
+                    Biography = aa.Artist.Biography,
+                    Genres = aa.Artist.Genres,
+                    ImageUrl = aa.Artist.ImageUrl,
+                    PopularityScore = aa.Artist.PopularityScore,
+                    PercentileScore = aa.Artist.PercentileScore,
+                }
                 ).ToList(),
                 Subgenres = randomAlbum.AlbumSubgenres.Select(asg => new SubgenreResponseDto
                 {
-                        Id = asg.Subgenre.Id,
-                        Name = asg.Subgenre.Name
+                    Id = asg.Subgenre.Id,
+                    Name = asg.Subgenre.Name
                 }).ToList(),
-                Moods = randomAlbum.AlbumMoods.Select(am => new MoodResponseDto 
-                    {
-                        Id = am.Mood.Id,
-                        Name = am.Mood.Name,
-                    }
+                Moods = randomAlbum.AlbumMoods.Select(am => new MoodResponseDto
+                {
+                    Id = am.Mood.Id,
+                    Name = am.Mood.Name,
+                }
                 ).ToList(),
             };
             return Ok(album);
