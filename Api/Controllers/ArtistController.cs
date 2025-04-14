@@ -5,6 +5,7 @@ using Api.Services.ApiServices.Spotify;
 using Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Api.Domain.Entities;
+using Api.Models.DTOs.ResponseDTOs;
 
 namespace Api.Controllers
 {
@@ -32,12 +33,55 @@ namespace Api.Controllers
         [HttpGet("get-artist")]
         public async Task<IActionResult> getArtist(int artistId)
         {
-            var artist =  await _dbContext.Artists.FirstOrDefaultAsync(a => a.Id == artistId);
+            var artistEntity =  await _dbContext.Artists.FirstOrDefaultAsync(a => a.Id == artistId);
 
-            if (artist == null)
+            if (artistEntity == null)
             {
                 return NotFound();
             }
+
+                var noteableAlbums = await _dbContext.Albums.Where(a => a.AlbumArtists.Any(aa => aa.Artist.Id == artistId)).OrderByDescending(a => a.PercentileScore).Take(4).Select(album => new AlbumResponseDto
+            {
+                Id = album.Id,
+                Title = album.Title,
+                Description = album.Description,
+                ImageUrl = album.ImageUrl,
+                Genre = new GenreResponseDto
+                {
+                    Id = album.Genre.Id,
+                    Name = album.Genre.Name,
+                },
+                Label = album.Label,
+                Moods = album.AlbumMoods.Select(am => new MoodResponseDto
+                {
+                    Id = am.Mood.Id,
+                    Name = am.Mood.Name,
+                }).ToList(),
+                PopularityScore = album.PopularityScore,
+                PercentileScore = album.PercentileScore,
+                PopularTracks = album.PopularTracks,
+                ReleaseYear = album.ReleaseYear,
+                Subgenres = album.AlbumSubgenres.Select(asg => new SubgenreResponseDto
+                {
+                    Id = asg.Subgenre.Id,
+                    Name = asg.Subgenre.Name,
+                }).ToList(),
+                Theme = album.AlbumTheme,
+                TotalTracks = album.TotalTracks,
+            }).ToListAsync();
+
+            var artist = new ArtistResponseDto
+            {
+                Id = artistEntity.Id,
+                Name = artistEntity.Name,
+                Biography = artistEntity.Biography,
+                Genres = artistEntity.Genres,
+                ImageUrl = artistEntity.ImageUrl,
+                PopularityScore = artistEntity.PopularityScore,
+                PercentileScore = artistEntity.PercentileScore, 
+                Instrument = artistEntity.Instrument,
+                NoteableAlbums = noteableAlbums
+            };
 
             return Ok(artist);
         }

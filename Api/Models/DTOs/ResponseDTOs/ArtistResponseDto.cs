@@ -9,5 +9,9 @@
         public string ImageUrl { get; set; }
         public int PopularityScore { get; set; }
         public double? PercentileScore { get; set; }
+        public string Instrument { get; set; }
+
+        //computed fields
+        public List<AlbumResponseDto> NoteableAlbums { get; set; } = new List<AlbumResponseDto>();
     }
 }
