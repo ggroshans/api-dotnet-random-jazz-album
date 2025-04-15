@@ -5,7 +5,6 @@ using Api.Services.ApiServices.Spotify;
 using Api.Domain.Entities;
 using Api.Utilities;
 using Newtonsoft.Json;
-using Api.Models;
 using Api.Models.DTOs.InternalDTOs;
 using Microsoft.AspNetCore.Mvc;
 
@@ -191,9 +190,6 @@ namespace Api.Services
                 existingDiscoTransaction.RequestDetails = JsonConvert.SerializeObject(requestDetails);
                 _db.SaveChanges();
             }
-
-            NormalizeAlbumPopularityScores();
-            NormalizeArtistPopularityScores();
         }
 
         public async Task<ArtistProcessingDto> GetArtistDetailsAsync(ArtistProcessingDto artist)
@@ -201,44 +197,6 @@ namespace Api.Services
             var spotifyArtist = await _spotifyApiService.GetSpotifyArtist(artist);
             var gptArtist = await _gptApiService.GetGptArtistDetails(spotifyArtist);
             return gptArtist;
-        }
-
-        public void NormalizeAlbumPopularityScores()
-        {
-            var albums = _db.Albums.ToList();
-
-            if (albums.Count == 0)
-            {
-                throw new Exception("Album count is 0");
-            }
-
-            foreach (var album in albums)
-            {
-                var lower = albums.Count(a => a.PopularityScore < album.PopularityScore);
-                var percentile = Math.Round((double)lower / albums.Count * 100, 0);
-
-                album.PercentileScore = percentile;
-            }
-            _db.SaveChanges();
-        }
-
-        public void NormalizeArtistPopularityScores()
-        {
-            var artists = _db.Artists.ToList();
-
-            if (artists.Count == 0)
-            {
-                throw new Exception("Artist count is 0");
-            }
-
-            foreach (var artist in artists)
-            {
-                var lower = artists.Count(a => a.PopularityScore < artist.PopularityScore);
-                var percentile = Math.Round((double)lower / artists.Count * 100, 0);
-
-                artist.PercentileScore = percentile;
-            }
-            _db.SaveChanges();
         }
     }
 }
