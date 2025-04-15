@@ -6,6 +6,8 @@ using Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Api.Models.DTOs.InternalDTOs;
 using Api.Models.DTOs.ResponseDTOs;
+using System.Runtime.CompilerServices;
+using System.Net;
 
 namespace Api.Controllers
 {
@@ -30,26 +32,6 @@ namespace Api.Controllers
             _dbContext = dbContext;
         }
 
-        [HttpPost("populate-from-artist")]
-        public async Task<IActionResult> PopulateAlbumsFromArtist([FromBody] AlbumProcessingRequestDto requestQuery)
-        {
-            var spotifyAlbums = await _spotifyApiService.GetSpotifyAlbums(requestQuery.ArtistName);
-            if (!spotifyAlbums.Any())
-            {
-                return NotFound($"Could not find any albums by {requestQuery.ArtistName} on Spotify.");
-            }
-
-            var (discoTransaction, processedAlbums, batchError) = await _openAIservice.BatchProcessAlbums(spotifyAlbums, requestQuery.ArtistName);
-            if (batchError) 
-            {
-
-                return BadRequest($"Batch Error: {discoTransaction.ErrorMessage}"); 
-            }
-
-            await _populateDbService.PopulateAlbumAsync(discoTransaction, processedAlbums);
-            return Ok(processedAlbums);
-        }
-
         [HttpGet("random-album")]
         public async Task<IActionResult> GetRandomAlbum()
         {
@@ -63,7 +45,6 @@ namespace Api.Controllers
                     .ThenInclude(asg => asg.Subgenre)
                 .OrderBy(a => Guid.NewGuid()).FirstOrDefaultAsync();
 
- 
             var album = new AlbumResponseDto
             {
                 Id = randomAlbum.Id,
