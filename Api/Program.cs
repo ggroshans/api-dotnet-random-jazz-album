@@ -3,8 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Api.Data;
 using Api.Services.ApiServices;
 using Api.Services.ApiServices.Spotify;
-using Api.Services.AuthServices.Spotify;
 using Serilog;
+using Api.Services.ApiServices.Spotify.SpotifyAuthService;
 
 namespace RandomAlbumApi
 {
@@ -47,6 +47,7 @@ namespace RandomAlbumApi
             builder.Services.AddScoped<GptApiService>();
             builder.Services.AddScoped<SpotifyApiService>();
             builder.Services.AddScoped<ISpotifyClient, SpotifyClient>();
+            builder.Services.AddScoped<StreamingLinksService>();
             builder.Services.AddScoped<PopulateDbService>();
   
             var app = builder.Build();
