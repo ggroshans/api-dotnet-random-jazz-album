@@ -1,9 +1,7 @@
-﻿using System;
-using System.Net.Http.Headers;
-using Api.Domain.Entities;
+﻿using System.Net.Http.Headers;
 using Api.Models.DTOs.InternalDTOs;
 using Api.Services.ApiServices.Spotify.DTOs;
-using Api.Services.AuthServices.Spotify;
+using Api.Services.ApiServices.Spotify.SpotifyAuthService;
 using Newtonsoft.Json;
 
 namespace Api.Services.ApiServices.Spotify

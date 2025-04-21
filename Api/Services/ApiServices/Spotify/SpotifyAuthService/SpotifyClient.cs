@@ -1,7 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using Newtonsoft.Json;
 
-namespace Api.Services.AuthServices.Spotify
+namespace Api.Services.ApiServices.Spotify.SpotifyAuthService
 {
     public class SpotifyClient : ISpotifyClient
     {
@@ -26,7 +26,7 @@ namespace Api.Services.AuthServices.Spotify
                 dynamic responseObject = JsonConvert.DeserializeObject(jsonResponse);
                 string accessToken = responseObject.access_token;
 
-                return accessToken;            
+                return accessToken;
             }
         }
     }

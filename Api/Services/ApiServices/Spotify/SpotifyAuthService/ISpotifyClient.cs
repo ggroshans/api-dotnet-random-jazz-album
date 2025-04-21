@@ -1,4 +1,4 @@
-﻿namespace Api.Services.AuthServices.Spotify
+﻿namespace Api.Services.ApiServices.Spotify.SpotifyAuthService
 {
     public interface ISpotifyClient
     {
