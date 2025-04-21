@@ -14,6 +14,11 @@
         public List<string> PopularTracks { get; set; }
         public string ReleaseYear { get; set; }
         public int TotalTracks { get; set; }
+        public string SpotifyId { get; set; }
+        public string YoutubeId { get; set; }
+        public string AppleMusicId { get; set; }
+        public string AmazonMusicId { get; set; }
+        public string PandoraId { get; set; }
         public List<ArtistResponseDto> Artists { get; set; }
         public List<SubgenreResponseDto> Subgenres { get; set; }
         public List<MoodResponseDto> Moods { get; set; }

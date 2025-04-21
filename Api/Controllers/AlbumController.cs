@@ -4,10 +4,7 @@ using Api.Services;
 using Api.Services.ApiServices.Spotify;
 using Api.Data;
 using Microsoft.EntityFrameworkCore;
-using Api.Models.DTOs.InternalDTOs;
 using Api.Models.DTOs.ResponseDTOs;
-using System.Runtime.CompilerServices;
-using System.Net;
 
 namespace Api.Controllers
 {
@@ -63,6 +60,11 @@ namespace Api.Controllers
                 PopularTracks = randomAlbum.PopularTracks,
                 ReleaseYear = randomAlbum.ReleaseYear,
                 TotalTracks = randomAlbum.TotalTracks,
+                SpotifyId = randomAlbum.SpotifyId,
+                YoutubeId = randomAlbum.YoutubeId,
+                AppleMusicId = randomAlbum.AppleMusicId,
+                AmazonMusicId = randomAlbum.AmazonMusicId,
+                PandoraId = randomAlbum.PandoraId,
                 Artists = randomAlbum.AlbumArtists.Select(aa => new ArtistResponseDto
                 {
                     Id = aa.Artist.Id,

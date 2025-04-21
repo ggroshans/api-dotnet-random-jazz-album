@@ -2,22 +2,27 @@
 {
     public class Album
     {
-        //spotify fields
+        //spotify api fields
         public int Id { get; set; }
         public string Title { get; set; }
         public string ReleaseYear { get; set; }
         public int TotalTracks { get; set; }
         public string ImageUrl { get; set; }
         public int PopularityScore { get; set; }
-        public double? PercentileScore { get; set; }
+        public double PercentileScore { get; set; }
         public string Label { get; set; }
-        public string SpotifyId { get; set; }
 
-        //gpt fields
+        //gpt api fields
         public string? Description { get; set; }
         public string? AlbumTheme { get; set; }
         public List<string>? PopularTracks { get; set; }
 
+        //songlink api fields
+        public string SpotifyId { get; set; } // Technically retrieved from spotify api
+        public string? YoutubeId { get; set; }
+        public string? AppleMusicId { get; set; }
+        public string? AmazonMusicId { get; set; }
+        public string? PandoraId { get; set; }
 
         // relationships
         public List<AlbumArtist> AlbumArtists { get; set; } = new List<AlbumArtist>();

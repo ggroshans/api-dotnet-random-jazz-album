@@ -15,12 +15,14 @@ namespace Api.Services
         private readonly MusicDbContext _db;
         private readonly SpotifyApiService _spotifyApiService;
         private readonly GptApiService _gptApiService;
+        private readonly StreamingLinksService _streamingLinksService;
 
-        public PopulateDbService(MusicDbContext db, SpotifyApiService spotifyApiService, GptApiService gptApiService)
+        public PopulateDbService(MusicDbContext db, SpotifyApiService spotifyApiService, GptApiService gptApiService, StreamingLinksService streamingLinksService )
         {
             _db = db;
             _spotifyApiService = spotifyApiService;
             _gptApiService = gptApiService;
+            _streamingLinksService = streamingLinksService;
         }
 
         public async Task PopulateAlbumAsync(DiscoTransaction discoTransaction, List<AlbumProcessingDto> albumDtos)
@@ -54,6 +56,9 @@ namespace Api.Services
 
                 if (existingAlbum == null)
                 {
+
+                    var streamingLinks = await _streamingLinksService.GetLinks(albumDto.SpotifyId);
+
                     requestDetails.AlbumCount += 1;
                     existingAlbum = new Album
                     {
@@ -69,6 +74,10 @@ namespace Api.Services
                         PopularityScore = albumDto.PopularityScore,
                         GenreId = existingGenre.Id,
                         DiscoTransactionId = discoTransaction.Id,
+                        YoutubeId = streamingLinks.TryGetValue("YOUTUBE_PLAYLIST", out var youtubeId) ? youtubeId : null,
+                        AppleMusicId = streamingLinks.TryGetValue("ITUNES_ALBUM", out var appleMusicId) ? appleMusicId : null,
+                        AmazonMusicId = streamingLinks.TryGetValue("AMAZON_ALBUM", out var amazonMusicId) ? amazonMusicId : null,
+                        PandoraId = streamingLinks.TryGetValue("PANDORA_ALBUM", out var soundCloudId) ? soundCloudId : null,
                     };
                     _db.Albums.Add(existingAlbum);
                     _db.SaveChanges();
