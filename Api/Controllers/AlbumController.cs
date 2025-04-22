@@ -29,65 +29,116 @@ namespace Api.Controllers
             _dbContext = dbContext;
         }
 
-        [HttpGet("random-album")]
+        [HttpGet("{Id}")]
+        public async Task<IActionResult> GetAlbumById(int Id)
+        {
+            var album = await _dbContext.Albums
+                .Where(a => a.Id == Id)
+                .Select(a => new AlbumResponseDto
+                {
+                    Id = a.Id,
+                    Title = a.Title,
+                    Description = a.Description,
+                    Genre = new GenreResponseDto
+                    {
+                        Id = a.Genre.Id,
+                        Name = a.Genre.Name
+                    },
+                    Theme = a.AlbumTheme,
+                    ImageUrl = a.ImageUrl,
+                    Label = a.Label,
+                    PopularityScore = a.PopularityScore,
+                    PercentileScore = a.PercentileScore,
+                    PopularTracks = a.PopularTracks,
+                    ReleaseYear = a.ReleaseYear,
+                    TotalTracks = a.TotalTracks,
+                    SpotifyId = a.SpotifyId,
+                    YoutubeId = a.YoutubeId,
+                    AppleMusicId = a.AppleMusicId,
+                    AmazonMusicId = a.AmazonMusicId,
+                    PandoraId = a.PandoraId,
+                    Artists = a.AlbumArtists.Select(aa => new ArtistResponseDto
+                    {
+                        Id = aa.Artist.Id,
+                        Name = aa.Artist.Name,
+                        Biography = aa.Artist.Biography,
+                        Genres = aa.Artist.Genres,
+                        ImageUrl = aa.Artist.ImageUrl,
+                        PopularityScore = aa.Artist.PopularityScore,
+                        PercentileScore = aa.Artist.PercentileScore,
+                    }).ToList(),
+                    Subgenres = a.AlbumSubgenres.Select(asg => new SubgenreResponseDto
+                    {
+                        Id = asg.Subgenre.Id,
+                        Name = asg.Subgenre.Name
+                    }).ToList(),
+                    Moods = a.AlbumMoods.Select(am => new MoodResponseDto
+                    {
+                        Id = am.Mood.Id,
+                        Name = am.Mood.Name,
+                    }).ToList(),
+                })
+                .FirstOrDefaultAsync();
+
+            if (album == null) 
+            {
+                return NotFound(); 
+            }
+
+            return Ok(album);
+        }
+
+        [HttpGet("random")]
         public async Task<IActionResult> GetRandomAlbum()
         {
-            var randomAlbum = await _dbContext.Albums
-                .Include(a => a.Genre)
-                .Include(a => a.AlbumArtists)
-                    .ThenInclude(aa => aa.Artist)
-                .Include(a => a.AlbumMoods)
-                    .ThenInclude(am => am.Mood)
-                .Include(a => a.AlbumSubgenres)
-                    .ThenInclude(asg => asg.Subgenre)
+
+            var album = await _dbContext.Albums
+                 .Select(a => new AlbumResponseDto
+                {
+                    Id = a.Id,
+                    Title = a.Title,
+                    Description = a.Description,
+                    Genre = new GenreResponseDto
+                    {
+                        Id = a.Genre.Id,
+                        Name = a.Genre.Name
+                    },
+                    Theme = a.AlbumTheme,
+                    ImageUrl = a.ImageUrl,
+                    Label = a.Label,
+                    PopularityScore = a.PopularityScore,
+                    PercentileScore = a.PercentileScore,
+                    PopularTracks = a.PopularTracks,
+                    ReleaseYear = a.ReleaseYear,
+                    TotalTracks = a.TotalTracks,
+                    SpotifyId = a.SpotifyId,
+                    YoutubeId = a.YoutubeId,
+                    AppleMusicId = a.AppleMusicId,
+                    AmazonMusicId = a.AmazonMusicId,
+                    PandoraId = a.PandoraId,
+                    Artists = a.AlbumArtists.Select(aa => new ArtistResponseDto
+                    {
+                        Id = aa.Artist.Id,
+                        Name = aa.Artist.Name,
+                        Biography = aa.Artist.Biography,
+                        Genres = aa.Artist.Genres,
+                        ImageUrl = aa.Artist.ImageUrl,
+                        PopularityScore = aa.Artist.PopularityScore,
+                        PercentileScore = aa.Artist.PercentileScore,
+                    }).ToList(),
+                    Subgenres = a.AlbumSubgenres.Select(asg => new SubgenreResponseDto
+                    {
+                        Id = asg.Subgenre.Id,
+                        Name = asg.Subgenre.Name
+                    }).ToList(),
+                    Moods = a.AlbumMoods.Select(am => new MoodResponseDto
+                    {
+                        Id = am.Mood.Id,
+                        Name = am.Mood.Name,
+                    }).ToList(),
+                })
                 .OrderBy(a => Guid.NewGuid()).FirstOrDefaultAsync();
 
-            var album = new AlbumResponseDto
-            {
-                Id = randomAlbum.Id,
-                Title = randomAlbum.Title,
-                Description = randomAlbum.Description,
-                Genre = new GenreResponseDto
-                {
-                    Id = randomAlbum.Genre.Id,
-                    Name = randomAlbum.Genre.Name
-                },
-                Theme = randomAlbum.AlbumTheme,
-                ImageUrl = randomAlbum.ImageUrl,
-                Label = randomAlbum.Label,
-                PopularityScore = randomAlbum.PopularityScore,
-                PercentileScore = randomAlbum.PercentileScore,
-                PopularTracks = randomAlbum.PopularTracks,
-                ReleaseYear = randomAlbum.ReleaseYear,
-                TotalTracks = randomAlbum.TotalTracks,
-                SpotifyId = randomAlbum.SpotifyId,
-                YoutubeId = randomAlbum.YoutubeId,
-                AppleMusicId = randomAlbum.AppleMusicId,
-                AmazonMusicId = randomAlbum.AmazonMusicId,
-                PandoraId = randomAlbum.PandoraId,
-                Artists = randomAlbum.AlbumArtists.Select(aa => new ArtistResponseDto
-                {
-                    Id = aa.Artist.Id,
-                    Name = aa.Artist.Name,
-                    Biography = aa.Artist.Biography,
-                    Genres = aa.Artist.Genres,
-                    ImageUrl = aa.Artist.ImageUrl,
-                    PopularityScore = aa.Artist.PopularityScore,
-                    PercentileScore = aa.Artist.PercentileScore,
-                }
-                ).ToList(),
-                Subgenres = randomAlbum.AlbumSubgenres.Select(asg => new SubgenreResponseDto
-                {
-                    Id = asg.Subgenre.Id,
-                    Name = asg.Subgenre.Name
-                }).ToList(),
-                Moods = randomAlbum.AlbumMoods.Select(am => new MoodResponseDto
-                {
-                    Id = am.Mood.Id,
-                    Name = am.Mood.Name,
-                }
-                ).ToList(),
-            };
             return Ok(album);
         }
     }
