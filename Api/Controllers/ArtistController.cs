@@ -4,7 +4,6 @@ using Api.Services;
 using Api.Services.ApiServices.Spotify;
 using Api.Data;
 using Microsoft.EntityFrameworkCore;
-using Api.Domain.Entities;
 using Api.Models.DTOs.ResponseDTOs;
 
 namespace Api.Controllers
@@ -78,10 +77,12 @@ namespace Api.Controllers
                 Genres = artistEntity.Genres,
                 ImageUrl = artistEntity.ImageUrl,
                 PopularityScore = artistEntity.PopularityScore,
-                PercentileScore = artistEntity.PercentileScore, 
+                PercentileScore = artistEntity.PercentileScore,
                 Instrument = artistEntity.Instrument,
-                NoteableAlbums = noteableAlbums
+                NoteableAlbums = noteableAlbums,
+                TotalAlbums = await _dbContext.AlbumArtists.Where(aa => aa.ArtistId == artistEntity.Id).Select(aa => aa.Album.Id).Distinct().CountAsync()
             };
+
 
             return Ok(artist);
         }
