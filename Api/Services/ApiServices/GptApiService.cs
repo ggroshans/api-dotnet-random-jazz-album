@@ -31,29 +31,36 @@ namespace Api.Services.ApiServices
                 albumNames.Add(album.Title);
             }
 
+            string schemaExplanation = @"
+                Each album object must have the following fields:
+                - title (string)
+                - description (string, ~200 characters)
+                - genre (string, one of: Jazz, Blues, Funk, Rock, Bluegrass)
+                - subgenres (array of strings, valid subgenres for the genre)
+                - moods (array of strings)
+                - popular_tracks (array of strings)
+                - album_theme (string)
+                ";
+
             string schema = @"
-    {
-        ""title"": { ""type"": ""string""},
-        ""description"": { ""type"": ""string"" }, // album description or release notes (~500 characters)
-        ""genre"": { ""type"": ""string"" }, // primary music genre (Only option is jazz)
-        ""subgenres"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } }, // list of subgenres
-        ""moods"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } }, // list of moods that describe the album
-        ""popular_tracks"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } }, // list of the most popular tracks from the album
-        ""album_theme"": { ""type"": ""string"" } // main theme or concept of the album
-    }";
+            {
+                ""title"": { ""type"": ""string""},
+                ""description"": { ""type"": ""string"" },
+                ""genre"": { ""type"": ""string"" },
+                ""subgenres"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } },
+                ""moods"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } },
+                ""popular_tracks"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } },
+                ""album_theme"": { ""type"": ""string"" }
+            }";
 
             var prompt = new StringBuilder();
-            prompt.AppendLine("Iterate through this string of album names, return a JSON array where each object (album) adheres to this schema:");
+            prompt.AppendLine("Iterate through the album names and return a JSON array where each album matches this schema:");
+            prompt.AppendLine(schemaExplanation);
             prompt.AppendLine(schema);
-            prompt.AppendLine("Formatted in a single line without line breaks or extra spaces, and without any code block formatting or additional text.");
-            prompt.AppendLine("Only update each album object from this Genres and these Subgenres");
-            prompt.AppendLine("Genre: Jazz, Subgenres: Swing, Bebop, Hard Bop, Cool Jazz, Modal Jazz, Free Jazz, Fusion, Latin Jazz, Soul Jazz, Smooth Jazz, Gypsy Jazz, Acid Jazz, Post-Bop, Avant-Garde Jazz, Dixieland, Jazz-Funk, Jazz Rap, Big Band, Vocal Jazz, Jazz Blues, Neo-Bop, Third Stream, Ethio-Jazz, M-Base, Nu Jazz, Spiritual Jazz");
-            prompt.AppendLine("Ensure that all albums are processed and included in the JSON response.");
-            //prompt.AppendLine("Genre: Blues, Subgenres: Delta Blues, Chicago Blues, Texas Blues, Piedmont Blues, Memphis Blues, Country Blues, Urban Blues, Jump Blues, Electric Blues, Swamp Blues, Blues Rock, Boogie-Woogie, Soul Blues, Gospel Blues, Acoustic Blues, British Blues, West Coast Blues, Rhythm and Blues (R&B), Funk Blues, Hill Country Blues, Jazz Blues, Punk Blues, New Orleans Blues, Louisiana Blues, Contemporary Blues, Ragtime Blues");
-            //prompt.AppendLine("Genre: Funk, Subgenres: P-Funk, Funk Rock, Funk Metal, Funk Soul, G-Funk, Jazz-Funk, Electro-Funk, Afrobeat, Go-Go, Psychedelic Funk, Disco Funk, Minneapolis Sound, Boogie, Funk Pop, Latin Funk, New Orleans Funk, Experimental Funk, Neo-Funk, Rare Groove, Future Funk");
+            prompt.AppendLine("Each album must have a genre from: [Jazz, Blues, Funk, Rock, Bluegrass] and valid subgenres.");
+            prompt.AppendLine("Ensure all albums are included in the JSON output.");
             prompt.AppendLine($"Albums: {string.Join(", ", albumNames)}");
 
-  
             discoTransaction.ResponseStatusCode = 200;
             discoTransaction.ErrorMessage = null;
             
