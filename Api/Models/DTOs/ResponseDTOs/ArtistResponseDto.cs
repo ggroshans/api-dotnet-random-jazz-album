@@ -11,6 +11,7 @@
         public double? PercentileScore { get; set; }
         public string Instrument { get; set; }
         public int TotalAlbums { get; set; }
+        public int AverageAlbumScore { get; set; }
 
 
         //computed fields

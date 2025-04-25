@@ -33,6 +33,9 @@ namespace Api.Controllers
         public async Task<IActionResult> getArtist(int artistId)
         {
             var artistEntity =  await _dbContext.Artists.FirstOrDefaultAsync(a => a.Id == artistId);
+            var artistAlbums = await _dbContext.AlbumArtists.Where(aa => aa.ArtistId == artistEntity.Id).Select(a => a.Album).Distinct().ToListAsync();
+
+            var albumScores = artistAlbums.Select(a => a.PercentileScore).ToList();
 
             if (artistEntity == null)
             {
@@ -80,9 +83,9 @@ namespace Api.Controllers
                 PercentileScore = artistEntity.PercentileScore,
                 Instrument = artistEntity.Instrument,
                 NoteableAlbums = noteableAlbums,
-                TotalAlbums = await _dbContext.AlbumArtists.Where(aa => aa.ArtistId == artistEntity.Id).Select(aa => aa.Album.Id).Distinct().CountAsync()
+                TotalAlbums = artistAlbums.Count,
+                AverageAlbumScore = (int)albumScores.Sum() / artistAlbums.Count,
             };
-
 
             return Ok(artist);
         }
