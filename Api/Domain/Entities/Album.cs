@@ -9,7 +9,7 @@
         public int TotalTracks { get; set; }
         public string ImageUrl { get; set; }
         public int PopularityScore { get; set; }
-        public double PercentileScore { get; set; }
+        public double? PercentileScore { get; set; }
         public string Label { get; set; }
 
         //gpt api fields
