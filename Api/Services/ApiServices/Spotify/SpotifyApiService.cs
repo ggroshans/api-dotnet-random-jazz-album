@@ -50,8 +50,10 @@ namespace Api.Services.ApiServices.Spotify
             {
                 _logger.Information($"Loop fired: Offset={offset} Total={total}");
 
-                string query = Uri.EscapeDataString($"artist:{artistName}"); // Format the query string
-                string albumsUrl = $"https://api.spotify.com/v1/search?q={query}&type=album&locale=en-US&offset={offset}&limit={Limit}";
+                //string query = Uri.EscapeDataString($"artist:{artistName}"); // Format the query string
+                string encodedQuery = Uri.EscapeDataString($"artist: {artistName}");
+                //string doubleEncodedQuery = Uri.EscapeDataString(firstEncodedQuery);
+                string albumsUrl = $"https://api.spotify.com/v1/search?q={encodedQuery}&type=album&locale=en-US&offset={offset}&limit={Limit}";
 
 
                 using (HttpClient httpClient = new HttpClient())
