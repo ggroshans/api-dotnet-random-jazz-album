@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Api.Domain.Entities;
+using Newtonsoft.Json;
 
 namespace Api.Models.DTOs.InternalDTOs
 {
@@ -17,9 +18,9 @@ namespace Api.Models.DTOs.InternalDTOs
 
         //gpt fields
         public string? Description { get; set; }
-        public string? Genre { get; set; }
+        public List<GenreProcessingDto> Genres { get; set; }
         public List<string>? Subgenres { get; set; }
-        public List<string>? Moods { get; set; }
+        public List<MoodProcessingDto>? Moods { get; set; }
         [JsonProperty("popular_tracks")]
         public List<string>? PopularTracks { get; set; }
         [JsonProperty("album_theme")]
