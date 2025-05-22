@@ -9,7 +9,7 @@ namespace Api.Data
         
         public DbSet<Album> Albums { get; set; }
         public DbSet<Artist> Artists { get; set; }
-        public DbSet<Genre> Genres { get; set; }
+        public DbSet<GenreType> GenreTypes { get; set; }
         public DbSet<Subgenre> Subgenres { get; set; }
         public DbSet<Mood> Moods { get; set; }  
         public DbSet<DiscoTransaction> DiscoTransactions { get; set; }
@@ -19,6 +19,8 @@ namespace Api.Data
         public DbSet<AlbumSubgenre> AlbumSubgenres { get; set; }
         public DbSet<AlbumMood> AlbumMoods { get; set; }
         public DbSet<AlbumGenre> AlbumGenres { get; set; }
+        public DbSet<JazzEraType> JazzEraTypes { get; set; }
+
 
         public MusicDbContext (DbContextOptions<MusicDbContext> options) : base(options)
     {
@@ -26,6 +28,37 @@ namespace Api.Data
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+            modelBuilder.Entity<GenreType>().HasData(
+                new GenreType { Id = 1, Name = "Classical" },
+                new GenreType { Id = 2, Name = "Jazz" },
+                new GenreType { Id = 3, Name = "Blues" },
+                new GenreType { Id = 4, Name = "Rock" },
+                new GenreType { Id = 5, Name = "Pop" },
+                new GenreType { Id = 6, Name = "Country" },
+                new GenreType { Id = 7, Name = "Folk" },
+                new GenreType { Id = 8, Name = "Hip-Hop/Rap" },
+                new GenreType { Id = 9, Name = "Electronic" },
+                new GenreType { Id = 10, Name = "Reggae" },
+                new GenreType { Id = 11, Name = "R&B/Soul" },
+                new GenreType { Id = 12, Name = "Metal" },
+                new GenreType { Id = 13, Name = "World Music" },
+                new GenreType { Id = 14, Name = "Gospel" },
+                new GenreType { Id = 15, Name = "Latin" }
+            );
+
+            modelBuilder.Entity<JazzEraType>().HasData(
+                new JazzEraType { Id = 1, Name = "Early Jazz / New Orleans Jazz", StartYear = 1900, EndYear = 1929 },
+                new JazzEraType { Id = 2, Name = "Swing Era / Big Band Era", StartYear = 1930, EndYear = 1944 },
+                new JazzEraType { Id = 3, Name = "Bebop", StartYear = 1945, EndYear = 1954 },
+                new JazzEraType { Id = 4, Name = "Cool Jazz", StartYear = 1949, EndYear = 1959 },
+                new JazzEraType { Id = 5, Name = "Hard Bop", StartYear = 1955, EndYear = 1965 },
+                new JazzEraType { Id = 6, Name = "Modal Jazz", StartYear = 1958, EndYear = 1967 },
+                new JazzEraType { Id = 7, Name = "Free Jazz / Avant-Garde", StartYear = 1960, EndYear = 1974 },
+                new JazzEraType { Id = 8, Name = "Jazz Fusion", StartYear = 1969, EndYear = 1989 },
+                new JazzEraType { Id = 9, Name = "Neo-Bop", StartYear = 1980, EndYear = 1999 },
+                new JazzEraType { Id = 10, Name = "Contemporary Jazz / 21st Century Jazz", StartYear = 2000, EndYear = null }
+            );
+        
 
             foreach (var entity in modelBuilder.Model.GetEntityTypes())
             {
@@ -58,7 +91,7 @@ namespace Api.Data
             // mapping table names to lowercase
             modelBuilder.Entity<Album>().ToTable("albums");
             modelBuilder.Entity<Artist>().ToTable("artists");
-            modelBuilder.Entity<Genre>().ToTable("genres");
+            modelBuilder.Entity<GenreType>().ToTable("genre_types");
             modelBuilder.Entity<Subgenre>().ToTable("subgenres");
             modelBuilder.Entity<Mood>().ToTable("moods");
             modelBuilder.Entity<DiscoTransaction>().ToTable("disco_transactions");
@@ -67,6 +100,7 @@ namespace Api.Data
             modelBuilder.Entity<AlbumSubgenre>().ToTable("album_subgenres");
             modelBuilder.Entity<AlbumMood>().ToTable("album_moods");
             modelBuilder.Entity<AlbumGenre>().ToTable("album_genres");
+            modelBuilder.Entity<JazzEraType>().ToTable("jazz_era_types");
 
             // Album + Artist (many to many)
             modelBuilder.Entity<AlbumArtist>()
@@ -144,12 +178,6 @@ namespace Api.Data
             modelBuilder.Entity<Artist>()
                 .HasOne(a => a.DiscoTransaction)
                 .WithMany(dt => dt.Artists)
-                .HasForeignKey(a => a.DiscoTransactionId);
-
-            // Genre + DiscoTransaction (one to many)
-            modelBuilder.Entity<Genre>()
-                .HasOne(g => g.DiscoTransaction)
-                .WithMany(dt => dt.Genres)
                 .HasForeignKey(a => a.DiscoTransactionId);
 
             // Mood + DiscoTransaction (one to many)
