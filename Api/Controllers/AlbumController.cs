@@ -39,11 +39,16 @@ namespace Api.Controllers
                     Id = a.Id,
                     Title = a.Title,
                     Description = a.Description,
-                    Genre = new GenreResponseDto
+                    Genre = a.AlbumGenres.Select(ag => new GenreResponseDto
                     {
-                        Id = a.Genre.Id,
-                        Name = a.Genre.Name
-                    },
+                        Id = ag.GenreType.Id,
+                        Name = ag.GenreType.Name,
+                        Subgenres = ag.GenreType.Subgenres.Select(sg => new SubgenreResponseDto
+                        {
+                            Id = sg.Id,
+                            Name = sg.Name
+                        }).ToList(),
+                    }).ToList(),
                     Theme = a.AlbumTheme,
                     ImageUrl = a.ImageUrl,
                     Label = a.Label,
@@ -66,11 +71,6 @@ namespace Api.Controllers
                         ImageUrl = aa.Artist.ImageUrl,
                         PopularityScore = aa.Artist.PopularityScore,
                         PercentileScore = aa.Artist.PercentileScore,
-                    }).ToList(),
-                    Subgenres = a.AlbumSubgenres.Select(asg => new SubgenreResponseDto
-                    {
-                        Id = asg.Subgenre.Id,
-                        Name = asg.Subgenre.Name
                     }).ToList(),
                     Moods = a.AlbumMoods.Select(am => new MoodResponseDto
                     {
@@ -98,12 +98,17 @@ namespace Api.Controllers
                     Id = a.Id,
                     Title = a.Title,
                     Description = a.Description,
-                    Genre = new GenreResponseDto
-                    {
-                        Id = a.Genre.Id,
-                        Name = a.Genre.Name
-                    },
-                    Theme = a.AlbumTheme,
+                     Genre = a.AlbumGenres.Select(ag => new GenreResponseDto
+                     {
+                         Id = ag.GenreType.Id,
+                         Name = ag.GenreType.Name,
+                         Subgenres = ag.GenreType.Subgenres.Select(sg => new SubgenreResponseDto
+                         {
+                             Id = sg.Id,
+                             Name = sg.Name
+                         }).ToList(),
+                     }).ToList(),
+                     Theme = a.AlbumTheme,
                     ImageUrl = a.ImageUrl,
                     Label = a.Label,
                     PopularityScore = a.PopularityScore,
@@ -125,11 +130,6 @@ namespace Api.Controllers
                         ImageUrl = aa.Artist.ImageUrl,
                         PopularityScore = aa.Artist.PopularityScore,
                         PercentileScore = aa.Artist.PercentileScore,
-                    }).ToList(),
-                    Subgenres = a.AlbumSubgenres.Select(asg => new SubgenreResponseDto
-                    {
-                        Id = asg.Subgenre.Id,
-                        Name = asg.Subgenre.Name
                     }).ToList(),
                     Moods = a.AlbumMoods.Select(am => new MoodResponseDto
                     {

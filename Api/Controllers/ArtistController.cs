@@ -8,7 +8,6 @@ using Api.Models.DTOs.ResponseDTOs;
 
 namespace Api.Controllers
 {
-
     [Route("api/artist")]
     [ApiController]
     public class ArtistController : ControllerBase
@@ -41,18 +40,22 @@ namespace Api.Controllers
             {
                 return NotFound();
             }
-
-                var noteableAlbums = await _dbContext.Albums.Where(a => a.AlbumArtists.Any(aa => aa.Artist.Id == artistId)).OrderByDescending(a => a.PercentileScore).Take(4).Select(album => new AlbumResponseDto
+                var noteableAlbums = artistAlbums.OrderByDescending(a => a.PercentileScore).Take(4).Select(album => new AlbumResponseDto
             {
                 Id = album.Id,
                 Title = album.Title,
                 Description = album.Description,
                 ImageUrl = album.ImageUrl,
-                Genre = new GenreResponseDto
+                Genre = album.AlbumGenres.Select(ag => new GenreResponseDto
                 {
-                    Id = album.Genre.Id,
-                    Name = album.Genre.Name,
-                },
+                    Id = ag.GenreType.Id,
+                    Name = ag.GenreType.Name,
+                    Subgenres = ag.GenreType.Subgenres.Select(sg => new SubgenreResponseDto
+                    {
+                        Id = sg.Id,
+                        Name = sg.Name
+                    }).ToList(),
+                }).ToList(),
                 Label = album.Label,
                 Moods = album.AlbumMoods.Select(am => new MoodResponseDto
                 {
@@ -63,14 +66,9 @@ namespace Api.Controllers
                 PercentileScore = album.PercentileScore,
                 PopularTracks = album.PopularTracks,
                 ReleaseYear = album.ReleaseYear,
-                Subgenres = album.AlbumSubgenres.Select(asg => new SubgenreResponseDto
-                {
-                    Id = asg.Subgenre.Id,
-                    Name = asg.Subgenre.Name,
-                }).ToList(),
                 Theme = album.AlbumTheme,
                 TotalTracks = album.TotalTracks,
-            }).ToListAsync();
+            }).ToList();
 
             var artist = new ArtistResponseDto
             {
@@ -85,6 +83,7 @@ namespace Api.Controllers
                 NoteableAlbums = noteableAlbums,
                 TotalAlbums = artistAlbums.Count,
                 AverageAlbumScore = (int)albumScores.Sum() / artistAlbums.Count,
+                DebutYear = artistAlbums.Select(aa => aa.ReleaseYear).OrderBy(a => a).FirstOrDefault().ToString(),
             };
 
             return Ok(artist);
