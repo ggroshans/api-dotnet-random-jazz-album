@@ -1,9 +1,10 @@
 ﻿namespace Api.Models.DTOs.InternalDTOs
 {
-    public class GenreTypeProcessingDto
+    public class MoodProcessingDto
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public List<string> Subgenres { get; set; }
+        public double Valence { get; set; }
+        public double Arousal { get; set; }
     }
 }

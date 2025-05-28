@@ -29,6 +29,8 @@
         public List<AlbumSubgenre>? AlbumSubgenres { get; set; } = new List<AlbumSubgenre>();
         public List<AlbumMood>? AlbumMoods { get; set; } = new List<AlbumMood>();
         public List<AlbumGenre>? AlbumGenres { get; set; } = new List<AlbumGenre>();
+        public int? JazzEraTypeId { get; set; }
+        public JazzEraType JazzEraType { get; set; }
         public Guid DiscoTransactionId { get; set; }
         public DiscoTransaction DiscoTransaction { get; set; }
     }

@@ -32,18 +32,19 @@ namespace Api.Data
                 new GenreType { Id = 1, Name = "Classical" },
                 new GenreType { Id = 2, Name = "Jazz" },
                 new GenreType { Id = 3, Name = "Blues" },
-                new GenreType { Id = 4, Name = "Rock" },
-                new GenreType { Id = 5, Name = "Pop" },
-                new GenreType { Id = 6, Name = "Country" },
-                new GenreType { Id = 7, Name = "Folk" },
-                new GenreType { Id = 8, Name = "Hip-Hop/Rap" },
-                new GenreType { Id = 9, Name = "Electronic" },
-                new GenreType { Id = 10, Name = "Reggae" },
-                new GenreType { Id = 11, Name = "R&B/Soul" },
-                new GenreType { Id = 12, Name = "Metal" },
-                new GenreType { Id = 13, Name = "World Music" },
-                new GenreType { Id = 14, Name = "Gospel" },
-                new GenreType { Id = 15, Name = "Latin" }
+                new GenreType { Id = 4, Name = "Funk"},
+                new GenreType { Id = 5, Name = "Rock" },
+                new GenreType { Id = 6, Name = "Pop" },
+                new GenreType { Id = 7, Name = "Country" },
+                new GenreType { Id = 8, Name = "Folk" },
+                new GenreType { Id = 9, Name = "Hip-Hop/Rap" },
+                new GenreType { Id = 10, Name = "Electronic" },
+                new GenreType { Id = 11, Name = "Reggae" },
+                new GenreType { Id = 12, Name = "R&B/Soul" },
+                new GenreType { Id = 13, Name = "Metal" },
+                new GenreType { Id = 14, Name = "World Music" },
+                new GenreType { Id = 15, Name = "Gospel" },
+                new GenreType { Id = 16, Name = "Latin" }
             );
 
             modelBuilder.Entity<JazzEraType>().HasData(
@@ -144,25 +145,31 @@ namespace Api.Data
                 .WithMany(m => m.AlbumMoods)
                 .HasForeignKey(am => am.MoodId);
 
-            // Album + Genre (many to many)
+            // Album + GenreType (many to many)
             modelBuilder.Entity<AlbumGenre>()
-                .HasKey(ag => new { ag.AlbumId, ag.GenreId });
+                .HasKey(ag => new { ag.AlbumId, ag.GenreTypeId });
 
             modelBuilder.Entity<AlbumGenre>()
-                .HasOne(ag => ag.Genre)
+                .HasOne(ag => ag.GenreType)
                 .WithMany(g => g.AlbumGenres)
-                .HasForeignKey(a => a.GenreId);
+                .HasForeignKey(a => a.GenreTypeId);
 
             modelBuilder.Entity<AlbumGenre>()
                 .HasOne(ag => ag.Album)
                 .WithMany(a => a.AlbumGenres)
                 .HasForeignKey(a => a.AlbumId);
 
-            // Genre + Subgenre (one to many)
+            // GenreType + Subgenre (one to many)
             modelBuilder.Entity<Subgenre>()
-                .HasOne(s => s.Genre)
+                .HasOne(s => s.GenreType)
                 .WithMany(g => g.Subgenres)
-                .HasForeignKey(s => s.GenreId);
+                .HasForeignKey(s => s.GenreTypeId);
+
+            // JazzEraType + Album (one to many)
+            modelBuilder.Entity<Album>()
+                .HasOne(a => a.JazzEraType)
+                .WithMany(j => j.Albums)
+                .HasForeignKey(a => a.JazzEraTypeId);
 
             // ***
             // DiscoTransaction Relationships

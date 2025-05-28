@@ -18,11 +18,13 @@ namespace Api.Models.DTOs.InternalDTOs
 
         //gpt fields
         public string? Description { get; set; }
-        public List<GenreProcessingDto> Genres { get; set; }
-        public List<string>? Subgenres { get; set; }
+        [JsonProperty("is_original_release")]
+        public bool IsOriginalRelease { get; set; }
+
+        [JsonProperty("jazz_era")]
+        public JazzEraTypeProcessingDto JazzEra { get; set; }
+        public List<GenreTypeProcessingDto> Genres { get; set; }
         public List<MoodProcessingDto>? Moods { get; set; }
-        [JsonProperty("popular_tracks")]
-        public List<string>? PopularTracks { get; set; }
         [JsonProperty("album_theme")]
         public string? AlbumTheme { get; set; }
     }

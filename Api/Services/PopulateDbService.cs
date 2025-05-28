@@ -6,7 +6,6 @@ using Api.Domain.Entities;
 using Api.Utilities;
 using Newtonsoft.Json;
 using Api.Models.DTOs.InternalDTOs;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Services
 {
@@ -33,23 +32,7 @@ namespace Api.Services
 
             foreach (var albumDto in albumDtos)
             {
-                
-                // ------- Genre -------
-                var dbGenres = await _db.Genres.ToListAsync();
-                var existingGenre = dbGenres.FirstOrDefault(g => StringUtils.NormalizeName(g.Name) == StringUtils.NormalizeName(albumDto.Genre));
-                if (existingGenre == null)
-                {
-                    existingGenre = new Genre
-                    {
-                        Name = StringUtils.CapitalizeAndFormat(albumDto.Genre),
-                        DiscoTransactionId = discoTransaction.Id,
-                    };
-
-                    _db.Genres.Add(existingGenre);
-                    _db.SaveChanges();
-                }
-
-
+               
                 // -------- Overall Album --------
                 var dbAlbums = await _db.Albums.ToListAsync();
                 var existingAlbum = dbAlbums.FirstOrDefault(a => StringUtils.NormalizeName(a.Title) == StringUtils.NormalizeName(albumDto.Title));
@@ -58,8 +41,9 @@ namespace Api.Services
                 {
 
                     var streamingLinks = await _streamingLinksService.GetLinks(albumDto.SpotifyId);
+                    //var existingJazzEraType = await _db.JazzEraTypes.FirstOrDefaultAsync(j => (j.Name == albumDto.JazzEra.Name) && (j.Id == albumDto.JazzEra.Id));
 
-                    requestDetails.AlbumCount += 1;
+                    requestDetails.NewAlbumCount += 1;
                     existingAlbum = new Album
                     {
                         Title = StringUtils.CapitalizeAndFormat(albumDto.Title),
@@ -68,11 +52,10 @@ namespace Api.Services
                         ImageUrl = albumDto.ImageUrl,
                         SpotifyId = albumDto.SpotifyId,
                         Description = StringUtils.CapitalizeSentences(albumDto.Description), 
-                        PopularTracks = albumDto.PopularTracks,
                         AlbumTheme = StringUtils.CapitalizeSentences(albumDto.AlbumTheme),
                         Label = StringUtils.CapitalizeAndFormat(albumDto.Label),
                         PopularityScore = albumDto.PopularityScore,
-                        GenreId = existingGenre.Id,
+                        JazzEraTypeId = null,
                         DiscoTransactionId = discoTransaction.Id,
                         YoutubeId = streamingLinks.TryGetValue("YOUTUBE_PLAYLIST", out var youtubeId) ? youtubeId : null,
                         AppleMusicId = streamingLinks.TryGetValue("ITUNES_ALBUM", out var appleMusicId) ? appleMusicId : null,
@@ -92,7 +75,7 @@ namespace Api.Services
 
                     if (existingArtist == null)
                     {
-                        requestDetails.ArtistCount += 1;
+                        requestDetails.NewArtistCount += 1;
                         var populatedArtist = await GetArtistDetailsAsync(artistDto);
                         existingArtist = new Artist
                         {
@@ -128,14 +111,16 @@ namespace Api.Services
                 foreach (var moodDto in albumDto.Moods)
                 {
                     var dbMoods = await _db.Moods.ToListAsync();
-                    var existingMood = dbMoods.FirstOrDefault(m => StringUtils.NormalizeName(m.Name) == StringUtils.NormalizeName(moodDto));
+                    var existingMood = dbMoods.FirstOrDefault(m => StringUtils.NormalizeName(m.Name) == StringUtils.NormalizeName(moodDto.Name));
                     
                     if (existingMood == null)
                     {
-                        requestDetails.MoodCount += 1;
+                        requestDetails.NewMoodCount += 1;
                         existingMood = new Mood
                         {
-                            Name = StringUtils.CapitalizeAndFormat(moodDto),
+                            Name = StringUtils.CapitalizeAndFormat(moodDto.Name),
+                            EmotionScore = moodDto.Valence,
+                            EnergyScore = moodDto.Arousal,
                             DiscoTransactionId = discoTransaction.Id,
                         };
 
@@ -157,37 +142,54 @@ namespace Api.Services
                     }
                 }
 
-
-                // ------- Subgenres -------
-                foreach (var subgenreDto in albumDto.Subgenres)
+                // ------- Genres -------
+                foreach (var genreDto in albumDto.Genres)
                 {
-                    var dbSubgenres = await _db.Subgenres.ToListAsync();
-                    var existingSubgenre = dbSubgenres.FirstOrDefault(sg => StringUtils.NormalizeName(sg.Name) == StringUtils.NormalizeName(subgenreDto));
-
-                    if (existingSubgenre == null)
+                    // ------- Subgenres -------
+                    foreach (var subgenreDto in genreDto.Subgenres)
                     {
-                        requestDetails.SubgenreCount += 1;
-                        existingSubgenre = new Subgenre
+                        var dbSubgenres = await _db.Subgenres.ToListAsync();
+                        var existingSubgenre = dbSubgenres.FirstOrDefault(sg => StringUtils.NormalizeName(sg.Name) == StringUtils.NormalizeName(subgenreDto));
+
+                        if (existingSubgenre == null)
                         {
-                            Name = StringUtils.CapitalizeAndFormat(subgenreDto),
-                            GenreId = existingGenre.Id,
-                            DiscoTransactionId = discoTransaction.Id,
-                        };
-                        _db.Subgenres.Add(existingSubgenre);
-                        _db.SaveChanges();
+                            requestDetails.NewSubgenreCount += 1;
+                            existingSubgenre = new Subgenre
+                            {
+                                Name = StringUtils.CapitalizeAndFormat(subgenreDto),
+                                GenreTypeId = genreDto.Id, 
+                                DiscoTransactionId = discoTransaction.Id,
+                            };
+                            _db.Subgenres.Add(existingSubgenre);
+                            _db.SaveChanges();
+                        }
+
+
+                        // ** Album Subgenre Junction Table **
+                        if (!await _db.AlbumSubgenres.AnyAsync(asg => asg.SubgenreId == existingSubgenre.Id && asg.AlbumId == existingAlbum.Id))
+                        {
+                            _db.AlbumSubgenres.Add(new AlbumSubgenre
+                            {
+                                Album = existingAlbum,
+                                Subgenre = existingSubgenre,
+                                DiscoTransactionId = discoTransaction.Id,
+                            });
+                            _db.SaveChanges();
+                        }
                     }
 
-
-                // ** Album Subgenre Junction Table **
-                    if (!await _db.AlbumSubgenres.AnyAsync(asg => asg.SubgenreId == existingSubgenre.Id && asg.AlbumId == existingAlbum.Id))
+                    //**Album Genre Junction Table * *
+                    if (!await _db.AlbumGenres.AnyAsync(ag => (ag.GenreTypeId == genreDto.Id && ag.AlbumId == existingAlbum.Id)))
                     {
-                        _db.AlbumSubgenres.Add(new AlbumSubgenre
+                        var dbGenreTypes = _db.GenreTypes.ToList();
+                        var existingGenreType = dbGenreTypes.FirstOrDefault(gt => gt.Id == genreDto.Id);
+
+                        _db.AlbumGenres.Add(new AlbumGenre
                         {
                             Album = existingAlbum,
-                            Subgenre = existingSubgenre,
-                            DiscoTransactionId = discoTransaction.Id,
+                            GenreType = existingGenreType,
+                            DiscoTransactionId = discoTransaction.Id
                         });
-                        _db.SaveChanges();
                     }
                 }
             }
