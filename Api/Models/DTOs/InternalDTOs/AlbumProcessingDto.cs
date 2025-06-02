@@ -20,7 +20,6 @@ namespace Api.Models.DTOs.InternalDTOs
         public string? Description { get; set; }
         [JsonProperty("is_original_release")]
         public bool IsOriginalRelease { get; set; }
-
         [JsonProperty("jazz_era")]
         public JazzEraTypeProcessingDto JazzEra { get; set; }
         public List<GenreTypeProcessingDto> Genres { get; set; }

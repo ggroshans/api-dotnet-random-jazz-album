@@ -54,9 +54,8 @@ namespace Api.Controllers
                     Label = a.Label,
                     PopularityScore = a.PopularityScore,
                     PercentileScore = a.PercentileScore,
-                    PopularTracks = a.PopularTracks,
                     ReleaseYear = a.ReleaseYear,
-                    TotalTracks = a.TotalTracks,
+                    TotalTracks = a.TotalTracks.HasValue ? a.TotalTracks.Value : 0, 
                     SpotifyId = a.SpotifyId,
                     YoutubeId = a.YoutubeId,
                     AppleMusicId = a.AppleMusicId,
@@ -80,9 +79,9 @@ namespace Api.Controllers
                 })
                 .FirstOrDefaultAsync();
 
-            if (album == null) 
+            if (album == null)
             {
-                return NotFound(); 
+                return NotFound();
             }
 
             return Ok(album);
@@ -113,7 +112,6 @@ namespace Api.Controllers
                     Label = a.Label,
                     PopularityScore = a.PopularityScore,
                     PercentileScore = a.PercentileScore,
-                    PopularTracks = a.PopularTracks,
                     ReleaseYear = a.ReleaseYear,
                     TotalTracks = a.TotalTracks,
                     SpotifyId = a.SpotifyId,

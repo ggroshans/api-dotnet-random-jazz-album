@@ -4,8 +4,8 @@
         {
             public Guid Id { get; set; }
             public DateTime TimeStamp { get; set; }
-            public string RequestDetails { get; set; }
-            public int ResponseStatusCode { get; set; }
+            public string? RequestDetails { get; set; }
+            public int? ResponseStatusCode { get; set; }
             public string? ErrorMessage { get; set; }
 
             // relationships

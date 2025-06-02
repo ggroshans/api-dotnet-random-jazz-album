@@ -64,7 +64,6 @@ namespace Api.Controllers
                 }).ToList(),
                 PopularityScore = album.PopularityScore,
                 PercentileScore = album.PercentileScore,
-                PopularTracks = album.PopularTracks,
                 ReleaseYear = album.ReleaseYear,
                 Theme = album.AlbumTheme,
                 TotalTracks = album.TotalTracks,

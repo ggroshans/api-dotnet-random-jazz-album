@@ -1,4 +1,6 @@
-﻿namespace Api.Models.DTOs.InternalDTOs
+﻿using Newtonsoft.Json;
+
+namespace Api.Models.DTOs.InternalDTOs
 {
     public class ArtistProcessingDto
     {
@@ -13,5 +15,8 @@
         //gpt fields
         public string Biography { get; set; }
         public string Instrument { get; set; }
+        [JsonProperty("related_artists")]
+        public List<string> RelatedArtists { get; set; } = new List<string>();
+        public List<string> Influences { get; set; } = new List<string>();
     }
 }
