@@ -29,7 +29,6 @@ namespace Api.Services
 
             RequestDetails requestDetails = JsonConvert.DeserializeObject<RequestDetails>(discoTransaction.RequestDetails) ?? new RequestDetails();
             
-
             foreach (var albumDto in albumDtos)
             {
                
@@ -39,9 +38,7 @@ namespace Api.Services
 
                 if (existingAlbum == null)
                 {
-
                     var streamingLinks = await _streamingLinksService.GetLinks(albumDto.SpotifyId);
-                    //var existingJazzEraType = await _db.JazzEraTypes.FirstOrDefaultAsync(j => (j.Name == albumDto.JazzEra.Name) && (j.Id == albumDto.JazzEra.Id));
 
                     requestDetails.NewAlbumCount += 1;
                     existingAlbum = new Album
@@ -55,7 +52,8 @@ namespace Api.Services
                         AlbumTheme = StringUtils.CapitalizeSentences(albumDto.AlbumTheme),
                         Label = StringUtils.CapitalizeAndFormat(albumDto.Label),
                         PopularityScore = albumDto.PopularityScore,
-                        JazzEraTypeId = null,
+                        IsOriginalRelease = albumDto.IsOriginalRelease,
+                        AlbumJazzEras = null,
                         DiscoTransactionId = discoTransaction.Id,
                         YoutubeId = streamingLinks.TryGetValue("YOUTUBE_PLAYLIST", out var youtubeId) ? youtubeId : null,
                         AppleMusicId = streamingLinks.TryGetValue("ITUNES_ALBUM", out var appleMusicId) ? appleMusicId : null,
@@ -85,6 +83,8 @@ namespace Api.Services
                             Genres = populatedArtist.Genres,
                             ImageUrl = populatedArtist.ImageUrl,
                             PopularityScore = populatedArtist.PopularityScore,
+                            RelatedArtists = populatedArtist.RelatedArtists,
+                            Influences = populatedArtist.Influences,
                             SpotifyId = artistDto.SpotifyId,
                             DiscoTransactionId = discoTransaction.Id,
                         };
@@ -106,7 +106,6 @@ namespace Api.Services
                     }
                 }
 
-
                 // ------- Mood -------
                 foreach (var moodDto in albumDto.Moods)
                 {
@@ -127,7 +126,6 @@ namespace Api.Services
                         _db.Moods.Add(existingMood);
                         _db.SaveChanges();
                     }
-
 
                 // ** Album Mood Junction Table **
                     if (!await _db.AlbumMoods.AnyAsync(am => am.MoodId == existingMood.Id && am.AlbumId == existingAlbum.Id))
@@ -163,7 +161,6 @@ namespace Api.Services
                             _db.Subgenres.Add(existingSubgenre);
                             _db.SaveChanges();
                         }
-
 
                         // ** Album Subgenre Junction Table **
                         if (!await _db.AlbumSubgenres.AnyAsync(asg => asg.SubgenreId == existingSubgenre.Id && asg.AlbumId == existingAlbum.Id))

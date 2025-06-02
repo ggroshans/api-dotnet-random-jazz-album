@@ -12,8 +12,10 @@
         public string SpotifyId { get; set; }
 
         //gpt fields
-        public string Biography { get; set; }
-        public string Instrument { get; set; }
+        public string? Biography { get; set; }
+        public string? Instrument { get; set; }
+        public List<string> RelatedArtists { get; set; } = new List<string>();
+        public List<string> Influences { get; set; } = new List<string>();
 
         //relationships
         public List<AlbumArtist> AlbumArtists { get; set; } = new List<AlbumArtist>();

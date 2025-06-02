@@ -3,7 +3,6 @@ using OpenAI.Chat;
 using System.Text;
 using Api.Domain.Entities;
 using Api.Data;
-using Api.Models;
 using Api.Utilities;
 using Api.Models.DTOs.InternalDTOs;
 
@@ -25,6 +24,7 @@ namespace Api.Services.ApiServices
         public async Task<(DiscoTransaction, List<AlbumProcessingDto>, bool)> GetGptAlbumDetails(List<AlbumProcessingDto> spotifyAlbums, string artistName, DiscoTransaction discoTransaction)
         {
             List<string> albumsForGpt = new List<string>();
+
             foreach (var album in spotifyAlbums)
             {
                 var albumAndYearDetails = $"Title: {album.Title}, Release Year: {album.ReleaseYear}";
@@ -32,106 +32,8 @@ namespace Api.Services.ApiServices
                 albumsForGpt.Add(albumAndYearDetails);
             }
 
-
             var genres = _dbContext.GenreTypes.Select(gt => gt.Name).ToList();
             var genresFormattedForGpt = string.Join(", ", genres);
-            //var jazzEras = _dbContext.JazzEraTypes.ToList();
-            //string jazzErasFormattedForGpt = JsonConvert.SerializeObject(jazzEras);
-
-            //string schemaExplanation = $@"
-            //    Each album object must have the following fields:
-            //    - title (string; title of album)
-            //    - description (string, ~200 characters description of album)
-            //    - genres (array of objects, each obj has a genre name (and a corresponding genre id based on genre types) that has to come from these types: {genresFormattedForGpt} and within each obj create a list of valid subgenres that fall under the genre umbrella based on the album. An album isnt limited to only one genre obj.)
-            //    - moods (array of three objects; valence and arousal values should reflect the name of the mood itself so the mood can be reused for other albums.)
-            //    - album_theme (string; ~100 character theme of album)
-            //    - jazz_era (object; pick the correct id and corresponding name using the jazz era information here: {jazzErasFormattedForGpt}. If is_original_release is false, don't use release year to determine era.)
-            //    - is_original_release (boolean; using the title and release year decide true if the album is the original studio release year and false if it's a re-release / reissued album, not a studio album or compilation (group studio albums does not count as a compilation.)";
-
-            //string schema = @"
-            //{
-            //    ""title"": { ""type"": ""string""},
-            //    ""description"": { ""type"": ""string"" },
-            //    ""genres"": {
-            //        ""type"": ""array"",
-            //        ""items"": {
-            //            ""type"": ""object"",
-            //            ""properties"": {
-            //                ""id"": { ""type"": ""number"" },
-            //                ""name"": { ""type"": ""string"" },
-            //                ""subgenres"": {
-            //                    ""type"": ""array"",
-            //                    ""items"": { ""type"": ""string"" }
-            //                }
-            //            }
-            //        }
-            //    },
-            //    ""moods"": {
-            //        ""type"": ""array"",
-            //        ""items"": {
-            //            ""type"": ""object"",
-            //            ""properties"": {
-            //                ""name"": { ""type"": ""string"" },
-            //                ""valence"": { ""type"": ""number"", ""minimum"": -1, ""maximum"": 1 },
-            //                ""arousal"": { ""type"": ""number"", ""minimum"": -1, ""maximum"": 1 }
-            //            },
-            //            ""required"": [""name"", ""valence"", ""arousal""]
-            //        }
-            //    },
-            //    ""album_theme"": { ""type"": ""string"" },
-            //    ""jazz_era"": {
-            //        ""type"": ""object"",
-            //        ""properties"": {
-            //            ""id"": { ""type"": ""number"" },
-            //            ""name"": { ""type"": ""string"" }
-            //        }
-            //    },
-            //    ""is_original_release"": { ""type"": ""boolean"" },
-            //}";
-
-            //string schemaExplanation = $@"
-            //    Each album object must have the following fields:
-            //    - title (string; title of album)
-            //    - description (string; ~200 characters description of album)
-            //    - genres (array of objects; each obj has a genre name (and a corresponding genre id based on genre types) that has to come from these types: {genresFormattedForGpt} and within each obj create a list of valid subgenres that fall under the genre umbrella based on the album. An album isnt limited to only one genre obj.)
-            //    - moods (array of three objects; valence and arousal values should reflect the name of the mood itself so the mood can be reused for other albums.)
-            //    - album_theme (string; ~100 character theme of album)
-            //    - is_original_release (boolean; using the title and release year decide true if the album is the original studio release year and false if it's a re-release / reissued album, not a studio album or compilation (group studio albums does not count as a compilation.)";
-
-            //string schema = @"
-            //{
-            //    ""title"": { ""type"": ""string""},
-            //    ""description"": { ""type"": ""string"" },
-            //    ""genres"": {
-            //        ""type"": ""array"",
-            //        ""items"": {
-            //            ""type"": ""object"",
-            //            ""properties"": {
-            //                ""id"": { ""type"": ""number"" },
-            //                ""name"": { ""type"": ""string"" },
-            //                ""subgenres"": {
-            //                    ""type"": ""array"",
-            //                    ""items"": { ""type"": ""string"" }
-            //                }
-            //            }
-            //        }
-            //    },
-            //    ""moods"": {
-            //        ""type"": ""array"",
-            //        ""items"": {
-            //            ""type"": ""object"",
-            //            ""properties"": {
-            //                ""name"": { ""type"": ""string"" },
-            //                ""valence"": { ""type"": ""number"", ""minimum"": -1, ""maximum"": 1 },
-            //                ""arousal"": { ""type"": ""number"", ""minimum"": -1, ""maximum"": 1 }
-            //            },
-            //            ""required"": [""name"", ""valence"", ""arousal""]
-            //        }
-            //    },
-            //    ""album_theme"": { ""type"": ""string"" },
-            //    ""is_original_release"": { ""type"": ""boolean"" },
-            //}";
-
             var prompt = new StringBuilder();
 
             prompt.AppendLine("For each album below, return a compact JSON array of objects in this format (avoid ```json):");
@@ -142,7 +44,7 @@ namespace Api.Services.ApiServices
             prompt.AppendLine("- album_theme: ~100 characters");
             prompt.AppendLine("- is_original_release: true/false — if not original studio release, mark false.");
 
-            prompt.AppendLine("Use only genres from: " + string.Join(", ", genres) + "and each album has unqiue genre/subgenres.");
+            prompt.AppendLine("Use only genres from: " + string.Join(", ", genres) + ". Subgenres must be more specific than their parent genre and cannot duplicate any genre in the provided list (e.g., 'Blues' or 'Jazz' cannot be subgenres).");
             prompt.AppendLine("Output a compact JSON array — no line breaks, code blocks, or extra text.");
             prompt.AppendLine("Albums to process: " + string.Join(", ", albumsForGpt));
 
@@ -229,34 +131,18 @@ namespace Api.Services.ApiServices
 
         public async Task<ArtistProcessingDto> GetGptArtistDetails(ArtistProcessingDto artist)
         {
+            var prompt = new StringBuilder();
+            prompt.AppendLine($"For the artist {artist.Name}, return a compact JSON object with these fields (avoid ```json):");
+            prompt.AppendLine("- biography: ~500 characters");
+            prompt.AppendLine("- instrument: string (main instrument, or 'group' if band)");
+            prompt.AppendLine("- related_artists: array of strings (related artists/musicians)");
+            prompt.AppendLine("- influences: array of strings (artists who influenced this artist)");
+            prompt.AppendLine("Output a single-line JSON object without line breaks, code blocks, or extra text.");
 
-            // ** Add to artist eventually
+            var chatCompletion = await _client.CompleteChatAsync(prompt.ToString());
+            var responseContent = chatCompletion?.Value.Content[0].Text;
 
-            //""related_artists"": {
-            //    ""type"": ""array"",
-            //        ""items"": { ""type"": ""string""},
-            //    },
-            //    ""influences"": {
-            //    ""type"": ""array"",
-            //        ""items"": { ""type"": ""string""},
-            //    },
-
-            string schema = @"
-        {
-            ""biography"": { ""type"": ""string"" }, // artist/musician description or release notes (~500 characters)
-            ""instrument"": { ""type"": ""string"" }, // the main instrument this artist/musician plays. If it's a band/group then return group
-        }";
-                var prompt = new StringBuilder();
-                prompt.AppendLine($"" +
-                    $"For the artist/musician: {artist.Name}, return a json object using this schema,  " +
-                    $"formatted in a single line without line breaks or extra spaces," +
-                    $"and without any code block formatting or additional text:");
-                prompt.AppendLine(schema);
-
-                var chatCompletion = await _client.CompleteChatAsync(prompt.ToString());
-                var responseContent = chatCompletion?.Value.Content[0].Text;
-
-                if (!string.IsNullOrEmpty(responseContent))
+            if (!string.IsNullOrEmpty(responseContent))
                 {
                     try
                     {
@@ -266,6 +152,8 @@ namespace Api.Services.ApiServices
                         {
                             artist.Biography = artistDetails.Biography;
                             artist.Instrument = artistDetails.Instrument;
+                            artist.RelatedArtists = artistDetails.RelatedArtists;
+                            artist.Influences = artistDetails.Influences;
                         }
                     }
 
