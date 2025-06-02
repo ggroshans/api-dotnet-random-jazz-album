@@ -12,6 +12,7 @@ namespace Api.Data
         public DbSet<GenreType> GenreTypes { get; set; }
         public DbSet<Subgenre> Subgenres { get; set; }
         public DbSet<Mood> Moods { get; set; }  
+        public DbSet<JazzEraType> JazzEraTypes { get; set; }
         public DbSet<DiscoTransaction> DiscoTransactions { get; set; }
 
         // Junction tables for many-to-many
@@ -19,7 +20,7 @@ namespace Api.Data
         public DbSet<AlbumSubgenre> AlbumSubgenres { get; set; }
         public DbSet<AlbumMood> AlbumMoods { get; set; }
         public DbSet<AlbumGenre> AlbumGenres { get; set; }
-        public DbSet<JazzEraType> JazzEraTypes { get; set; }
+        public DbSet<AlbumJazzEra> AlbumJazzEras { get; set; }
 
 
         public MusicDbContext (DbContextOptions<MusicDbContext> options) : base(options)
@@ -95,13 +96,14 @@ namespace Api.Data
             modelBuilder.Entity<GenreType>().ToTable("genre_types");
             modelBuilder.Entity<Subgenre>().ToTable("subgenres");
             modelBuilder.Entity<Mood>().ToTable("moods");
+            modelBuilder.Entity<JazzEraType>().ToTable("jazz_era_types");
             modelBuilder.Entity<DiscoTransaction>().ToTable("disco_transactions");
 
             modelBuilder.Entity<AlbumArtist>().ToTable("album_artists");
             modelBuilder.Entity<AlbumSubgenre>().ToTable("album_subgenres");
             modelBuilder.Entity<AlbumMood>().ToTable("album_moods");
             modelBuilder.Entity<AlbumGenre>().ToTable("album_genres");
-            modelBuilder.Entity<JazzEraType>().ToTable("jazz_era_types");
+            modelBuilder.Entity<AlbumJazzEra>().ToTable("album_jazz_eras");
 
             // Album + Artist (many to many)
             modelBuilder.Entity<AlbumArtist>()
@@ -159,17 +161,26 @@ namespace Api.Data
                 .WithMany(a => a.AlbumGenres)
                 .HasForeignKey(a => a.AlbumId);
 
+            // Album + JazzEraType (many to many)
+            modelBuilder.Entity<AlbumJazzEra>()
+                .HasKey(aje => new { aje.AlbumId, aje.JazzEraTypeId });
+
+            modelBuilder.Entity<AlbumJazzEra>()
+                .HasOne(aje => aje.Album)
+                .WithMany(a => a.AlbumJazzEras)
+                .HasForeignKey(aje => aje.AlbumId);
+
+            modelBuilder.Entity<AlbumJazzEra>()
+                .HasOne(aje => aje.JazzEraType)
+                .WithMany(j => j.AlbumJazzEras)
+                .HasForeignKey(aje => aje.JazzEraTypeId);
+
             // GenreType + Subgenre (one to many)
             modelBuilder.Entity<Subgenre>()
                 .HasOne(s => s.GenreType)
                 .WithMany(g => g.Subgenres)
                 .HasForeignKey(s => s.GenreTypeId);
 
-            // JazzEraType + Album (one to many)
-            modelBuilder.Entity<Album>()
-                .HasOne(a => a.JazzEraType)
-                .WithMany(j => j.Albums)
-                .HasForeignKey(a => a.JazzEraTypeId);
 
             // ***
             // DiscoTransaction Relationships
