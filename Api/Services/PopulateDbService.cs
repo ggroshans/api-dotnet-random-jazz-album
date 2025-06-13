@@ -66,45 +66,49 @@ namespace Api.Services
 
 
                 //  -------- Artist --------
-                foreach (var artistDto in albumDto.Artists)
+                    
+                var dbArtists = await _db.Artists.ToListAsync();
+                var existingArtist = dbArtists.FirstOrDefault(a => StringUtils.NormalizeName(a.Name) == StringUtils.NormalizeName(albumDto.Artists[0].Name)); 
+
+                var additionalArtists = albumDto.Artists.Skip(1).Select(a => a.Name).ToList();
+
+                if (existingArtist == null)
                 {
-                    var dbArtists = await _db.Artists.ToListAsync();
-                    var existingArtist = dbArtists.FirstOrDefault(a => StringUtils.NormalizeName(a.Name) == StringUtils.NormalizeName(artistDto.Name)); 
-
-                    if (existingArtist == null)
+                    requestDetails.NewArtistCount += 1;
+                    var populatedArtist = await GetArtistDetailsAsync(albumDto.Artists[0]);
+                    existingArtist = new Artist
                     {
-                        requestDetails.NewArtistCount += 1;
-                        var populatedArtist = await GetArtistDetailsAsync(artistDto);
-                        existingArtist = new Artist
-                        {
-                            Name = StringUtils.CapitalizeAndFormat(artistDto.Name),
-                            Biography = StringUtils.CapitalizeSentences(populatedArtist.Biography),
-                            Instrument = StringUtils.CapitalizeAndFormat(populatedArtist.Instrument),
-                            Genres = populatedArtist.Genres,
-                            ImageUrl = populatedArtist.ImageUrl,
-                            PopularityScore = populatedArtist.PopularityScore,
-                            RelatedArtists = populatedArtist.RelatedArtists,
-                            Influences = populatedArtist.Influences,
-                            SpotifyId = artistDto.SpotifyId,
-                            DiscoTransactionId = discoTransaction.Id,
-                        };
-                        _db.Artists.Add(existingArtist);
-                        _db.SaveChanges();
-                        
-                    }
-
-                    // ** Album Artist Junction Table **
-                    if (!await _db.AlbumArtists.AnyAsync(aa => aa.ArtistId == existingArtist.Id && aa.AlbumId == existingAlbum.Id))
-                    {
-                        _db.AlbumArtists.Add(new AlbumArtist
-                        {
-                            Album = existingAlbum,
-                            Artist = existingArtist,
-                            DiscoTransactionId = discoTransaction.Id,
-                        });
-                        _db.SaveChanges();
-                    }
+                        Name = StringUtils.CapitalizeAndFormat(albumDto.Artists[0].Name),
+                        Biography = StringUtils.CapitalizeSentences(populatedArtist.Biography),
+                        BirthYear = populatedArtist.BirthYear,
+                        DeathYear = populatedArtist.DeathYear == "null" ? null : populatedArtist.DeathYear,
+                        Instrument = StringUtils.CapitalizeAndFormat(populatedArtist.Instrument),
+                        Genres = populatedArtist.Genres,
+                        ImageUrl = populatedArtist.ImageUrl,
+                        PopularityScore = populatedArtist.PopularityScore,
+                        AdditionalArtists = additionalArtists.Count > 0 ? String.Join(", ", additionalArtists) : null, 
+                        RelatedArtists = populatedArtist.RelatedArtists,
+                        Influences = populatedArtist.Influences,
+                        SpotifyId = albumDto.Artists[0].SpotifyId,
+                        DiscoTransactionId = discoTransaction.Id,
+                    };
+                    _db.Artists.Add(existingArtist);
+                    _db.SaveChanges();
+                    
                 }
+
+                // ** Album Artist Junction Table **
+                if (!await _db.AlbumArtists.AnyAsync(aa => aa.ArtistId == existingArtist.Id && aa.AlbumId == existingAlbum.Id))
+                {
+                    _db.AlbumArtists.Add(new AlbumArtist
+                    {
+                        Album = existingAlbum,
+                        Artist = existingArtist,
+                        DiscoTransactionId = discoTransaction.Id,
+                    });
+                    _db.SaveChanges();
+                }
+                
 
                 // ------- Mood -------
                 foreach (var moodDto in albumDto.Moods)
@@ -143,6 +147,8 @@ namespace Api.Services
                 // ------- Genres -------
                 foreach (var genreDto in albumDto.Genres)
                 {
+                    var matchingGenre = _db.GenreTypes.FirstOrDefault(gt => gt.Name == genreDto.Name);
+
                     // ------- Subgenres -------
                     foreach (var subgenreDto in genreDto.Subgenres)
                     {
@@ -155,7 +161,7 @@ namespace Api.Services
                             existingSubgenre = new Subgenre
                             {
                                 Name = StringUtils.CapitalizeAndFormat(subgenreDto),
-                                GenreTypeId = genreDto.Id, 
+                                GenreTypeId = matchingGenre.Id, 
                                 DiscoTransactionId = discoTransaction.Id,
                             };
                             _db.Subgenres.Add(existingSubgenre);
@@ -176,15 +182,14 @@ namespace Api.Services
                     }
 
                     //**Album Genre Junction Table * *
-                    if (!await _db.AlbumGenres.AnyAsync(ag => (ag.GenreTypeId == genreDto.Id && ag.AlbumId == existingAlbum.Id)))
+                    if (!await _db.AlbumGenres.AnyAsync(ag => (ag.GenreTypeId == matchingGenre.Id && ag.AlbumId == existingAlbum.Id)))
                     {
                         var dbGenreTypes = _db.GenreTypes.ToList();
-                        var existingGenreType = dbGenreTypes.FirstOrDefault(gt => gt.Id == genreDto.Id);
 
                         _db.AlbumGenres.Add(new AlbumGenre
                         {
                             Album = existingAlbum,
-                            GenreType = existingGenreType,
+                            GenreType = matchingGenre,
                             DiscoTransactionId = discoTransaction.Id
                         });
                     }

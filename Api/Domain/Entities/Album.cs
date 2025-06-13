@@ -9,20 +9,24 @@
         public int? TotalTracks { get; set; }
         public string ImageUrl { get; set; }
         public int PopularityScore { get; set; }
-        public double? PercentileScore { get; set; }
         public string? Label { get; set; }
 
-        //gpt api fields
+        // gpt api fields
         public string? Description { get; set; }
         public string? AlbumTheme { get; set; }
         public bool? IsOriginalRelease { get; set; }
 
-        //songlink api fields
+        // songlink api fields
         public string SpotifyId { get; set; } // Technically retrieved from spotify api
         public string? YoutubeId { get; set; }
         public string? AppleMusicId { get; set; }
         public string? AmazonMusicId { get; set; }
         public string? PandoraId { get; set; }
+
+        // computed fields
+        public double? PercentileScore { get; set; }
+        public double? AverageEmotionScore { get; set; }
+        public double? AverageEnergyScore { get; set; }
 
         // relationships
         public List<AlbumArtist> AlbumArtists { get; set; } = new List<AlbumArtist>();
