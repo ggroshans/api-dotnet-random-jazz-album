@@ -5,7 +5,8 @@
         //spotify api fields
         public int Id { get; set; }
         public string Title { get; set; }
-        public string ReleaseYear { get; set; }
+        public string ReleaseDate { get; set; }
+        public string ReleaseDatePrecision { get; set; }
         public int? TotalTracks { get; set; }
         public string ImageUrl { get; set; }
         public int PopularityScore { get; set; }
@@ -23,7 +24,8 @@
         public string? AmazonMusicId { get; set; }
         public string? PandoraId { get; set; }
 
-        // computed fields
+        // computed fields 
+        public int? SortableDate { get; set; } 
         public double? PercentileScore { get; set; }
         public double? AverageEmotionScore { get; set; }
         public double? AverageEnergyScore { get; set; }
