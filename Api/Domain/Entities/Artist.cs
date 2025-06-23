@@ -1,4 +1,6 @@
-﻿namespace Api.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Api.Domain.Entities
 {
     public class Artist
     {
@@ -22,6 +24,7 @@
         // computed fields
         public double? PercentileScore { get; set; }
         public int AlbumCount { get; set; }
+        [NotMapped]
         public List<Album> NoteableAlbums { get; set; } = new List<Album>();
         public int? AverageAlbumScore { get; set; }
         public SubgenreBreakdown? SubgenreBreakdown { get; set; }
