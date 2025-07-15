@@ -99,6 +99,49 @@ namespace Api.Utilities
             }
             return result.ToString().TrimEnd(); 
         }
+
+        public static int? ParseReleaseDate(string releaseDate, string releaseDatePrecision)
+        {
+            if (string.IsNullOrWhiteSpace(releaseDate) || string.IsNullOrWhiteSpace(releaseDatePrecision))
+            {
+                return null;
+            }
+
+            int? ReleaseYear = 0;
+            int? ReleaseMonth = 0;
+            int? ReleaseDay = 0;
+
+            var dateParts = releaseDate.Split('-');
+            if (dateParts.Length >=1 && int.TryParse(dateParts[0], out int year))
+            {
+                ReleaseYear = year;
+            }
+
+            if (releaseDatePrecision == "month" || releaseDatePrecision == "day")
+            {
+                if (dateParts.Length == 3)
+                {
+                    int.TryParse(dateParts[2], out int day);
+                    ReleaseDay = day;
+
+                    int.TryParse(dateParts[1], out int month);
+                    ReleaseMonth = month;
+                }
+                else if (dateParts.Length == 2)
+                {
+                    int.TryParse(dateParts[1], out int month);
+                    ReleaseMonth = month;
+                    ReleaseDay = 00;
+                }
+                else
+                {
+                    ReleaseMonth = 00;
+                    ReleaseDay = 00;
+                }
+            }
+
+            return (ReleaseYear) * 10000 + (ReleaseMonth) * 100 + (ReleaseDay);
+        }
     }
 }
 
