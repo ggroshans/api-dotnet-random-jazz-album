@@ -36,6 +36,9 @@ namespace Api.Services.ApiServices.Spotify.DTOs
         [JsonProperty("release_date")]
         public string ReleaseDate { get; set; }
 
+        [JsonProperty("release_date_precision")]
+        public string ReleaseDatePrecision { get; set; }
+
         [JsonProperty("total_tracks")]
         public int TotalTracks { get; set; }
     }

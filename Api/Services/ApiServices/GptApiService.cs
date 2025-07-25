@@ -27,26 +27,48 @@ namespace Api.Services.ApiServices
 
             foreach (var album in spotifyAlbums)
             {
-                var albumAndYearDetails = $"Title: {album.Title}, Release Year: {album.ReleaseYear}";
+                var albumAndYearDetails = $"Title: {album.Title}, Release Date: {album.ReleaseDate}";
 
                 albumsForGpt.Add(albumAndYearDetails);
             }
 
             var genres = _dbContext.GenreTypes.Select(gt => gt.Name).ToList();
-            var genresFormattedForGpt = string.Join(", ", genres);
+            var genresString = string.Join(", ", genres);
+
+            var jazzEras = _dbContext.JazzEraTypes.Select(jet => new { jet.Name, jet.Id }).ToList();
+            var jazzErasString = string.Join(", ", jazzEras);
+
             var prompt = new StringBuilder();
 
-            prompt.AppendLine("For each album below, return a compact JSON array of objects in this format (avoid ```json):");
+            prompt.AppendLine("Return a compact JSON array (no ```json or line breaks) for each album below using this format:");
             prompt.AppendLine("- title: string");
-            prompt.AppendLine("- description: ~200 characters");
-            prompt.AppendLine("- genres: array of objects { id, name, subgenres[] } using only genres from our DB. Add multiple subgenres (string[]) based on genre.");
-            prompt.AppendLine("- moods: array of 3 objects { name, valence [-1–1] of mood, arousal [-1–1] of mood }.");
-            prompt.AppendLine("- album_theme: ~100 characters");
-            prompt.AppendLine("- is_original_release: true/false — if not original studio release, mark false.");
+            prompt.AppendLine("- description: string (~200 chars). **CRUCIAL**: YOU MUST capitalize all proper nouns, including artist names (e.g., Norman Brown) and album/song titles (e.g., Let It Go).");
+            prompt.AppendLine("- genres: [{ name, subgenres[] }]. Use genres only from: " + genresString + ". Subgenres must be more specific and not a genre in the list.");
+            prompt.AppendLine("- moods: 3 objs [{ name, valence: 0–100, arousal: 0–100 }] using Arousal-Valence Model");
+            prompt.AppendLine("- is_original_release: true/false — false if not the artist’s original studio release");
+            prompt.AppendLine("- jazz_eras: int[] — choose one or more from: " + jazzErasString + " that best match the album’s jazz style (ignore release year)");
 
-            prompt.AppendLine("Use only genres from: " + string.Join(", ", genres) + ". Subgenres must be more specific than their parent genre and cannot duplicate any genre in the provided list (e.g., 'Blues' or 'Jazz' cannot be subgenres).");
+            //prompt.AppendLine("Examples:");
+            //prompt.AppendLine(@"[
+            //  {
+            //    ""title"": ""The Epic"",
+            //    ""description"": ""The Epic by Kamasi Washington is a sweeping jazz odyssey combining spiritual depth, orchestral scale, and fiery solos in a bold, cinematic soundscape."",
+            //    ""genres"": [
+            //      { ""name"": ""Jazz"", ""subgenres"": [""Spiritual Jazz"", ""Jazz-Funk"", ""Big Band"", ""Avant-Garde"", ""Post-Bop""] },
+            //      { ""name"": ""R&B/Soul"", ""subgenres"": [""Neo-Soul"", ""Jazz-Soul Fusion""] }
+            //    ],
+            //    ""moods"": [
+            //      { ""name"": ""Expansive"", ""valence"": 65, ""arousal"": 70 },
+            //      { ""name"": ""Powerful"", ""valence"": 60, ""arousal"": 80 },
+            //      { ""name"": ""Inspiring"", ""valence"": 75, ""arousal"": 65 }
+            //    ],
+            //    ""is_original_release"": true,
+            //    ""jazz_eras"": [14, 12, 13]
+            //  }
+            //]");
+
             prompt.AppendLine("Output a compact JSON array — no line breaks, code blocks, or extra text.");
-            prompt.AppendLine("Albums to process: " + string.Join(", ", albumsForGpt));
+            prompt.AppendLine("Albums to process: " + string.Join(", ", albumsForGpt) + "from " + artistName);
 
             discoTransaction.ResponseStatusCode = 200;
             discoTransaction.ErrorMessage = null;
@@ -73,18 +95,19 @@ namespace Api.Services.ApiServices
                                 {
                                      Title = spotifyAlbum.Title,
                                      Artists = spotifyAlbum.Artists,
-                                     ReleaseYear = spotifyAlbum.ReleaseYear,
+                                     ReleaseDate = spotifyAlbum.ReleaseDate,
+                                     ReleaseDatePrecision = spotifyAlbum.ReleaseDatePrecision,
+                                     SortableDate = spotifyAlbum.SortableDate,
                                      TotalTracks = spotifyAlbum.TotalTracks,
                                      ImageUrl = spotifyAlbum.ImageUrl,
                                      SpotifyId = spotifyAlbum.SpotifyId,
                                      Label = spotifyAlbum.Label,
-                                     PopularityScore = spotifyAlbum.PopularityScore,
+                                     SpotifyPopularity = spotifyAlbum.SpotifyPopularity,
                                      Description = matchingGptAlbum.Description,
                                      Genres = matchingGptAlbum.Genres,
                                      Moods = matchingGptAlbum.Moods,
-                                     JazzEra = matchingGptAlbum.JazzEra,
+                                     JazzEras = matchingGptAlbum.JazzEras,
                                      IsOriginalRelease = matchingGptAlbum.IsOriginalRelease,
-                                     AlbumTheme = matchingGptAlbum.AlbumTheme,
                                 };
                                 processedAlbums.Add(updatedAlbum);
                             }
@@ -133,10 +156,12 @@ namespace Api.Services.ApiServices
         {
             var prompt = new StringBuilder();
             prompt.AppendLine($"For the artist {artist.Name}, return a compact JSON object with these fields (avoid ```json):");
-            prompt.AppendLine("- biography: ~500 characters");
-            prompt.AppendLine("- instrument: string (main instrument, or 'group' if band)");
-            prompt.AppendLine("- related_artists: array of strings (related artists/musicians)");
-            prompt.AppendLine("- influences: array of strings (artists who influenced this artist)");
+            prompt.AppendLine("biography: ~500 characters");
+            prompt.AppendLine("birth_year: string");
+            prompt.AppendLine("death_year: string (return 'null' if alive)");
+            prompt.AppendLine("instrument: string (main instrument, or 'group' if band)");
+            prompt.AppendLine("related_artists: array of strings (related artists/musicians)");
+            prompt.AppendLine("influences: array of strings (artists who influenced this artist)");
             prompt.AppendLine("Output a single-line JSON object without line breaks, code blocks, or extra text.");
 
             var chatCompletion = await _client.CompleteChatAsync(prompt.ToString());
@@ -151,6 +176,8 @@ namespace Api.Services.ApiServices
                         if (artistDetails != null)
                         {
                             artist.Biography = artistDetails.Biography;
+                            artist.BirthYear = artistDetails.BirthYear;
+                            artist.DeathYear = artistDetails.DeathYear;
                             artist.Instrument = artistDetails.Instrument;
                             artist.RelatedArtists = artistDetails.RelatedArtists;
                             artist.Influences = artistDetails.Influences;

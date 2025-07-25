@@ -4,7 +4,7 @@
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public double Valence { get; set; }
-        public double Arousal { get; set; }
+        public int Valence { get; set; }
+        public int Arousal { get; set; }
     }
 }

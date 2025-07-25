@@ -9,7 +9,7 @@ namespace Api.Domain.Entities
         public string Name { get; set; }
         public List<string>? Genres { get; set; }
         public string? ImageUrl { get; set; }
-        public int PopularityScore { get; set; }
+        public int SpotifyPopularity { get; set; }
         public string SpotifyId { get; set; }
 
         // gpt fields
@@ -17,16 +17,17 @@ namespace Api.Domain.Entities
         public string? DeathYear { get; set; }
         public string? Biography { get; set; }
         public string? Instrument { get; set; }
-        public string? AdditionalArtists { get; set; }
         public List<string> RelatedArtists { get; set; } = new List<string>();
         public List<string> Influences { get; set; } = new List<string>();
 
         // computed fields
-        public double? PercentileScore { get; set; }
+        public int? PopularityRating { get; set; }
         public int AlbumCount { get; set; }
         [NotMapped]
         public List<Album> NoteableAlbums { get; set; } = new List<Album>();
-        public int? AverageAlbumScore { get; set; }
+        public int? AverageAlbumPopularityRating { get; set; }
+        public int? AverageEmotionalTone { get; set; }
+        public int? AverageEnergyLevel { get; set; }
         public SubgenreBreakdown? SubgenreBreakdown { get; set; }
         public YearsActive? YearsActive { get; set; }
         public MoodBreakdown? MoodBreakdown { get; set; }

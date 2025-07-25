@@ -22,8 +22,8 @@ namespace Api.Controllers
            try
             {
                 //EnrichOriginalAlbumOrder();
-                NormalizeAlbumPopularityScores();
-                NormalizeArtistPopularityScores();
+                NormalizeAlbumPopularityRatings();
+                NormalizeArtistPopularityRatings();
                 CalculateAlbumMoodScores();
                 CalculateOriginalAlbumOrder();
             } 
@@ -33,7 +33,7 @@ namespace Api.Controllers
             }
         }
 
-        private void NormalizeAlbumPopularityScores()
+        private void NormalizeAlbumPopularityRatings()
         {
             var albums = _db.Albums.ToList();
 
@@ -47,12 +47,12 @@ namespace Api.Controllers
                 var lower = albums.Count(a => a.SpotifyPopularity < album.SpotifyPopularity);
                 var percentile = (int)Math.Round((double)lower / albums.Count * 100, 0);
 
-                album.PopularityScore = percentile + 1;
+                album.PopularityRating = percentile + 1;
             }
             _db.SaveChanges();
         }
 
-        private void NormalizeArtistPopularityScores()
+        private void NormalizeArtistPopularityRatings()
         {
             var artists = _db.Artists.ToList();
 
@@ -66,7 +66,7 @@ namespace Api.Controllers
                 var lower = artists.Count(a => a.SpotifyPopularity < artist.SpotifyPopularity);
                 var percentile = (int)Math.Round((double)lower / artists.Count * 100, 0);
 
-                artist.PopularityScore = percentile + 1;
+                artist.PopularityRating = percentile + 1;
             }
             _db.SaveChanges();
         }

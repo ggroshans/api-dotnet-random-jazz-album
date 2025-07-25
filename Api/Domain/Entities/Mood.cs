@@ -4,8 +4,8 @@
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public double EmotionScore { get; set; }
-        public double EnergyScore { get; set; }
+        public int EmotionalTone { get; set; }
+        public int EnergyLevel { get; set; }
 
         // relationships
         public List<AlbumMood> AlbumMoods { get; set; } = new List<AlbumMood>();

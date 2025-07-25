@@ -46,7 +46,7 @@ namespace Api.Controllers
                      TotalTracks = a.TotalTracks,
                      IsOriginalRelease = a.IsOriginalRelease,
                      SortableDate = a.SortableDate,
-                     PopularityScore = a.PopularityScore,
+                     PopularityRating = a.PopularityRating,
                      AverageEmotionalTone = a.AverageEmotionalTone,
                      AverageEnergyLevel = a.AverageEnergyLevel,
                      SpotifyId = a.SpotifyId,
@@ -61,7 +61,7 @@ namespace Api.Controllers
                          Biography = aa.Artist.Biography,
                          Genres = aa.Artist.Genres,
                          ImageUrl = aa.Artist.ImageUrl,
-                         PopularityScore = aa.Artist.PopularityScore,
+                         PopularityRating = aa.Artist.PopularityRating,
                      }).ToList(),
                      Moods = a.AlbumMoods.Select(am => new MoodResponseDto
                      {
@@ -86,41 +86,43 @@ namespace Api.Controllers
 
             var album = await _dbContext.Albums
                  .Select(a => new AlbumResponseDto
-                {
-                    Id = a.Id,
-                    Title = a.Title,
-                    Description = a.Description,
-                    Genres = a.AlbumGenres.Select(ag => ag.GenreType.Name).ToList(),
-                    Subgenres = a.AlbumSubgenres.Select(asg => asg.Subgenre.Name).ToList(),
-                    ImageUrl = a.ImageUrl,
-                    Label = a.Label,
-                    TotalTracks = a.TotalTracks,
-                    IsOriginalRelease = a.IsOriginalRelease,
-                    SortableDate = a.SortableDate,
-                    PopularityScore = a.PopularityScore,
-                    AverageEmotionalTone = a.AverageEmotionalTone,
-                    AverageEnergyLevel = a.AverageEnergyLevel,
-                    SpotifyId = a.SpotifyId,
-                    YoutubeId = a.YoutubeId,
-                    AppleMusicId = a.AppleMusicId,
-                    AmazonMusicId = a.AmazonMusicId,
-                    PandoraId = a.PandoraId,
-                    Artists = a.AlbumArtists.Select(aa => new ArtistResponseDto
-                    {
-                        Id = aa.Artist.Id,
-                        Name = aa.Artist.Name,
-                        Biography = aa.Artist.Biography,
-                        Genres = aa.Artist.Genres,
-                        ImageUrl = aa.Artist.ImageUrl,
-                        PopularityScore = aa.Artist.PopularityScore,
-                    }).ToList(),
-                    Moods = a.AlbumMoods.Select(am => new MoodResponseDto
-                    {
-                        Id = am.Mood.Id,
-                        Name = am.Mood.Name,
-                    }).ToList(),
-                    OriginalAlbumOrder = a.AlbumArtists.FirstOrDefault().OriginalAlbumOrder,  
-                })
+                 {
+                     Id = a.Id,
+                     Title = a.Title,
+                     Description = a.Description,
+                     Genres = a.AlbumGenres.Select(ag => ag.GenreType.Name).ToList(),
+                     Subgenres = a.AlbumSubgenres.Select(asg => asg.Subgenre.Name).ToList(),
+                     ImageUrl = a.ImageUrl,
+                     Label = a.Label,
+                     TotalTracks = a.TotalTracks,
+                     IsOriginalRelease = a.IsOriginalRelease,
+                     SortableDate = a.SortableDate,
+                     PopularityRating = a.PopularityRating,
+                     AverageEmotionalTone = a.AverageEmotionalTone,
+                     AverageEnergyLevel = a.AverageEnergyLevel,
+                     SpotifyId = a.SpotifyId,
+                     YoutubeId = a.YoutubeId,
+                     AppleMusicId = a.AppleMusicId,
+                     AmazonMusicId = a.AmazonMusicId,
+                     PandoraId = a.PandoraId,
+                     Artists = a.AlbumArtists.Select(aa => new ArtistResponseDto
+                     {
+                         Id = aa.Artist.Id,
+                         Name = aa.Artist.Name,
+                         Biography = aa.Artist.Biography,
+                         Genres = aa.Artist.Genres,
+                         ImageUrl = aa.Artist.ImageUrl,
+                         PopularityRating = aa.Artist.PopularityRating,
+                     }).ToList(),
+                     Moods = a.AlbumMoods.Select(am => new MoodResponseDto
+                     {
+                         Id = am.Mood.Id,
+                         Name = am.Mood.Name,
+                     }).ToList(),
+                    JazzEras = a.AlbumJazzEras.Select(aje => aje.JazzEraType.Name).ToList(),
+                    AdditionalArtists = a.AdditionalArtists,
+                    OriginalAlbumOrder = a.AlbumArtists.FirstOrDefault().OriginalAlbumOrder,
+                 })
                 .OrderBy(a => Guid.NewGuid()).FirstOrDefaultAsync();
 
             return Ok(album);

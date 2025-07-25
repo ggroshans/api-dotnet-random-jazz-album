@@ -9,12 +9,12 @@
         public string ReleaseDatePrecision { get; set; }
         public int? TotalTracks { get; set; }
         public string ImageUrl { get; set; }
-        public int PopularityScore { get; set; }
+        public int SpotifyPopularity { get; set; }
         public string? Label { get; set; }
+        public string? AdditionalArtists { get; set; } 
 
         // gpt api fields
         public string? Description { get; set; }
-        public string? AlbumTheme { get; set; }
         public bool? IsOriginalRelease { get; set; }
 
         // songlink api fields
@@ -26,9 +26,9 @@
 
         // computed fields 
         public int? SortableDate { get; set; } 
-        public double? PercentileScore { get; set; }
-        public double? AverageEmotionScore { get; set; }
-        public double? AverageEnergyScore { get; set; }
+        public int? PopularityRating { get; set; }
+        public int? AverageEmotionalTone { get; set; }
+        public int? AverageEnergyLevel { get; set; }
 
         // relationships
         public List<AlbumArtist> AlbumArtists { get; set; } = new List<AlbumArtist>();

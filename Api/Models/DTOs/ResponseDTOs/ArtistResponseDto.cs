@@ -7,10 +7,9 @@
         public string? Biography { get; set; }
         public List<string> Genres { get; set; }
         public string ImageUrl { get; set; }
-        public int PopularityScore { get; set; }
-        public double? PercentileScore { get; set; }
+        public int? PopularityRating { get; set; }
         public string? Instrument { get; set; }
-        public int? TotalAlbums { get; set; }
+        public int? AlbumCount { get; set; }
         public int? AverageAlbumScore { get; set; }
         public string? DebutYear { get; set; }
 

@@ -213,11 +213,6 @@ namespace Api.Services
                     });
                     _db.SaveChanges();
                 }
-                
-
-
-
-
             }
 
             var existingDiscoTransaction = _db.DiscoTransactions.Find(discoTransaction.Id);

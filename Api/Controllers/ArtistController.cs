@@ -34,38 +34,35 @@ namespace Api.Controllers
             var artistEntity =  await _dbContext.Artists.FirstOrDefaultAsync(a => a.Id == artistId);
             var artistAlbums = await _dbContext.AlbumArtists.Where(aa => aa.ArtistId == artistEntity.Id).Select(a => a.Album).Distinct().ToListAsync();
 
-            var albumScores = artistAlbums.Select(a => a.PercentileScore).ToList();
+            var albumScores = artistAlbums.Select(a => a.PopularityRating).ToList();
 
             if (artistEntity == null)
             {
                 return NotFound();
             }
-                var noteableAlbums = artistAlbums.OrderByDescending(a => a.PercentileScore).Take(4).Select(album => new AlbumResponseDto
+                var noteableAlbums = artistAlbums.OrderByDescending(a => a.PopularityRating).Take(4).Select(album => new AlbumResponseDto
             {
                 Id = album.Id,
                 Title = album.Title,
                 Description = album.Description,
                 ImageUrl = album.ImageUrl,
-                Genre = album.AlbumGenres.Select(ag => new GenreResponseDto
-                {
-                    Id = ag.GenreType.Id,
-                    Name = ag.GenreType.Name,
-                    Subgenres = ag.GenreType.Subgenres.Select(sg => new SubgenreResponseDto
-                    {
-                        Id = sg.Id,
-                        Name = sg.Name
-                    }).ToList(),
-                }).ToList(),
+                //Genre = album.AlbumGenres.Select(ag => new GenreResponseDto
+                //{
+                //    Id = ag.GenreType.Id,
+                //    Name = ag.GenreType.Name,
+                //    Subgenres = ag.GenreType.Subgenres.Select(sg => new SubgenreResponseDto
+                //    {
+                //        Id = sg.Id,
+                //        Name = sg.Name
+                //    }).ToList(),
+                //}).ToList(),
                 Label = album.Label,
                 Moods = album.AlbumMoods.Select(am => new MoodResponseDto
                 {
                     Id = am.Mood.Id,
                     Name = am.Mood.Name,
                 }).ToList(),
-                PopularityScore = album.PopularityScore,
-                PercentileScore = album.PercentileScore,
-                ReleaseYear = album.ReleaseYear,
-                Theme = album.AlbumTheme,
+                PopularityRating = album.PopularityRating,
                 TotalTracks = album.TotalTracks,
             }).ToList();
 
@@ -76,13 +73,12 @@ namespace Api.Controllers
                 Biography = artistEntity.Biography,
                 Genres = artistEntity.Genres,
                 ImageUrl = artistEntity.ImageUrl,
-                PopularityScore = artistEntity.PopularityScore,
-                PercentileScore = artistEntity.PercentileScore,
+                PopularityRating = artistEntity.PopularityRating,
                 Instrument = artistEntity.Instrument,
                 NoteableAlbums = noteableAlbums,
-                TotalAlbums = artistAlbums.Count,
+                AlbumCount = artistAlbums.Count,
                 AverageAlbumScore = (int)albumScores.Sum() / artistAlbums.Count,
-                DebutYear = artistAlbums.Select(aa => aa.ReleaseYear).OrderBy(a => a).FirstOrDefault().ToString(),
+                //DebutYear = artistAlbums.Select(aa => aa.ReleaseYear).OrderBy(a => a).FirstOrDefault().ToString(),
             };
 
             return Ok(artist);

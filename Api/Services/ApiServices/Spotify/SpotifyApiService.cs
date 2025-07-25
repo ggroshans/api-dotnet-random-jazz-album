@@ -2,6 +2,7 @@
 using Api.Models.DTOs.InternalDTOs;
 using Api.Services.ApiServices.Spotify.DTOs;
 using Api.Services.ApiServices.Spotify.SpotifyAuthService;
+using Api.Utilities;
 using Newtonsoft.Json;
 
 namespace Api.Services.ApiServices.Spotify
@@ -78,9 +79,12 @@ namespace Api.Services.ApiServices.Spotify
                             if (filteredAlbum != null)
                             {
                                 var additionalAlbumDetails = await GetAdditionalAlbumDetails(album);
-                                
+
+                                filteredAlbum.ReleaseDate = album.ReleaseDate;                                
+                                filteredAlbum.ReleaseDatePrecision = album.ReleaseDatePrecision;
+                                filteredAlbum.SortableDate = StringUtils.ParseReleaseDate(album.ReleaseDate, album.ReleaseDatePrecision);
                                 filteredAlbum.Label = additionalAlbumDetails.Label;
-                                filteredAlbum.PopularityScore = additionalAlbumDetails.PopularityScore;
+                                filteredAlbum.SpotifyPopularity = additionalAlbumDetails.PopularityScore;
 
                                 processedAlbums.Add(filteredAlbum);
                             }
@@ -114,7 +118,6 @@ namespace Api.Services.ApiServices.Spotify
             {
                 Title = album.Name,
                 Artists = artists,
-                ReleaseYear = album.ReleaseDate.Substring(0, 4),
                 TotalTracks = album.TotalTracks,
                 ImageUrl = image,
                 SpotifyId = album.Id,
@@ -168,7 +171,7 @@ namespace Api.Services.ApiServices.Spotify
                     Name = deserializedSpotifyData.Name,
                     Genres = deserializedSpotifyData.Genres,
                     ImageUrl = deserializedSpotifyData.Images.OrderByDescending(img => img.Height).FirstOrDefault().Url,
-                    PopularityScore = deserializedSpotifyData.PopularityScore,
+                    SpotifyPopularity = deserializedSpotifyData.PopularityScore,
                 };
             }
             return spotifyArtist;
