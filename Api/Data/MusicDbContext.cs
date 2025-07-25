@@ -29,6 +29,8 @@ namespace Api.Data
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
+            // seeding initial data for GenreType and JazzEraType
             modelBuilder.Entity<GenreType>().HasData(
                 new GenreType { Id = 1, Name = "Classical" },
                 new GenreType { Id = 2, Name = "Jazz" },
@@ -49,19 +51,50 @@ namespace Api.Data
             );
 
             modelBuilder.Entity<JazzEraType>().HasData(
-                new JazzEraType { Id = 1, Name = "Early Jazz / New Orleans Jazz", StartYear = 1900, EndYear = 1929 },
-                new JazzEraType { Id = 2, Name = "Swing Era / Big Band Era", StartYear = 1930, EndYear = 1944 },
-                new JazzEraType { Id = 3, Name = "Bebop", StartYear = 1945, EndYear = 1954 },
-                new JazzEraType { Id = 4, Name = "Cool Jazz", StartYear = 1949, EndYear = 1959 },
-                new JazzEraType { Id = 5, Name = "Hard Bop", StartYear = 1955, EndYear = 1965 },
-                new JazzEraType { Id = 6, Name = "Modal Jazz", StartYear = 1958, EndYear = 1967 },
-                new JazzEraType { Id = 7, Name = "Free Jazz / Avant-Garde", StartYear = 1960, EndYear = 1974 },
-                new JazzEraType { Id = 8, Name = "Jazz Fusion", StartYear = 1969, EndYear = 1989 },
-                new JazzEraType { Id = 9, Name = "Neo-Bop", StartYear = 1980, EndYear = 1999 },
-                new JazzEraType { Id = 10, Name = "Contemporary Jazz / 21st Century Jazz", StartYear = 2000, EndYear = null }
-            );
-        
+                // Foundational
+                new JazzEraType { Id = 1, Name = "Ragtime", StartYear = 1897, EndYear = 1918 },
+                new JazzEraType { Id = 2, Name = "Early Jazz / New Orleans Jazz", StartYear = 1910, EndYear = 1929 },
 
+                // The Swing Era & Its Variants
+                new JazzEraType { Id = 3, Name = "Kansas City Jazz", StartYear = 1928, EndYear = 1942 },
+                new JazzEraType { Id = 4, Name = "Swing Era / Big Band Era", StartYear = 1930, EndYear = 1945 },
+                new JazzEraType { Id = 5, Name = "Gypsy Jazz (Jazz Manouche)", StartYear = 1934, EndYear = 1953 },
+
+                // The Modern Jazz Revolution
+                new JazzEraType { Id = 6, Name = "Bebop", StartYear = 1945, EndYear = 1955 },
+                new JazzEraType { Id = 7, Name = "Cool Jazz", StartYear = 1949, EndYear = 1959 },
+                new JazzEraType { Id = 8, Name = "Hard Bop", StartYear = 1954, EndYear = 1965 },
+                new JazzEraType { Id = 9, Name = "Soul Jazz", StartYear = 1958, EndYear = 1969 },
+                new JazzEraType { Id = 10, Name = "Modal Jazz", StartYear = 1958, EndYear = 1967 },
+
+                // New Directions and Fusions
+                new JazzEraType { Id = 11, Name = "Free Jazz / Avant-Garde", StartYear = 1960, EndYear = 1974 },
+                new JazzEraType { Id = 12, Name = "Post-Bop", StartYear = 1964, EndYear = 1972 },
+                new JazzEraType { Id = 13, Name = "Jazz Fusion", StartYear = 1969, EndYear = 1989 },
+                new JazzEraType { Id = 14, Name = "Jazz-Funk", StartYear = 1972, EndYear = 1982 },
+
+                // Contemporary and Parallel Streams
+                new JazzEraType { Id = 15, Name = "Latin Jazz (Afro-Cuban & Brazilian)", StartYear = 1947, EndYear = null }, // Ongoing
+                new JazzEraType { Id = 16, Name = "Neo-Bop", StartYear = 1980, EndYear = 1999 },
+                new JazzEraType { Id = 17, Name = "Smooth Jazz", StartYear = 1982, EndYear = 1999 },
+                new JazzEraType { Id = 18, Name = "Acid Jazz", StartYear = 1987, EndYear = 1997 },
+                new JazzEraType { Id = 19, Name = "Contemporary Jazz / Modern Creative", StartYear = 2000, EndYear = null }
+            );
+
+            // configuring jsonb columns for Artist entity
+            modelBuilder.Entity<Artist>(entity =>
+            {
+                entity.Property(a => a.SubgenreBreakdown)
+                      .HasColumnType("jsonb"); 
+
+                entity.Property(a => a.YearsActive)
+                      .HasColumnType("jsonb");
+
+                entity.Property(a => a.MoodBreakdown)
+                      .HasColumnType("jsonb");
+            });
+
+            // formatting all table and column names to snake_case
             foreach (var entity in modelBuilder.Model.GetEntityTypes())
             {
                 // Set table name to snake_case
@@ -104,6 +137,9 @@ namespace Api.Data
             modelBuilder.Entity<AlbumMood>().ToTable("album_moods");
             modelBuilder.Entity<AlbumGenre>().ToTable("album_genres");
             modelBuilder.Entity<AlbumJazzEra>().ToTable("album_jazz_eras");
+
+
+            // **CONFIGURING RELATIONSHIPS*
 
             // Album + Artist (many to many)
             modelBuilder.Entity<AlbumArtist>()
