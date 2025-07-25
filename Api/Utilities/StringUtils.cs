@@ -92,7 +92,7 @@ namespace Api.Utilities
                 result.Append(char.ToUpper(trimmedSentence[0]));
                 if (trimmedSentence.Length > 1)
                 {
-                    result.Append(trimmedSentence.Substring(1).ToLower());
+                    result.Append(trimmedSentence.Substring(1));
                 }
 
                 result.Append(" "); 
