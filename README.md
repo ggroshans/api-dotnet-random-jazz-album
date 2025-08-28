@@ -1,14 +1,47 @@
 # 🎷 Jazz Music Discovery API & Data Pipeline
 
-This repository contains the backend API for a jazz music discovery application. Its primary function is to build and maintain a custom, enriched music database. By ingesting data from third-party sources like **Spotify** and **OpenAI (GPT-4o)** and storing it in a persistent **PostgreSQL** database, the application creates a resilient and independent datastore. This strategy ensures long-term stability and reduces reliance on external APIs for core read operations, using them only for adding new discographies.
+This repository contains the backend API for a full-stack jazz music discovery application. The frontend, an Angular application, is in a separate repository [here](https://github.com/ggroshans/fe-angular-random-jazz-album).
+
+This API's primary function is to build and maintain a custom, enriched music database. By ingesting data from third-party sources like **Spotify** and **OpenAI (GPT-4o)** and storing it in a persistent **PostgreSQL** database, the application creates a resilient and independent datastore. This strategy ensures long-term stability and reduces reliance on external APIs for core read operations, using them only for adding new discographies.
 
 ## 🎯 Project Goal
 
-The primary goal of this application is to encourage music discovery. The API's core function is to serve a random, enriched jazz album to a frontend application each day. This presents users with an opportunity to listen to something they might not be familiar with or wouldn't typically choose, broadening their musical horizons one album at a time.
+The primary goal of this application is to encourage music discovery. The API serves an "Album of the Day" to the frontend, presenting users with a random, enriched jazz album. This creates an opportunity for users to listen to something they might not be familiar with or wouldn't typically choose, broadening their musical horizons one album at a time.
+
+## 🏛️ Full Project Architecture
+
+The application is a full-stack project with a distinct frontend and backend. The backend API (this repository) acts as the central hub for data aggregation, enrichment, and persistence.
+
+```mermaid
+graph TD
+    subgraph Frontend
+        A[Angular Client]
+    end
+
+    subgraph "Backend (This Repo)"
+        B(ASP.NET Core API)
+    end
+
+    subgraph "Data Sources"
+        C[Spotify API]
+        D[OpenAI API]
+        E[Song.link API]
+    end
+
+    subgraph Database
+        F[(PostgreSQL)]
+    end
+
+    A -- HTTP Requests --> B
+    B -- Fetches Data --> C
+    B -- Enriches Metadata --> D
+    B -- Gets Streaming Links --> E
+    B -- Persists & Queries --> F
+```
 
 ## ✨ Core Features
 
-* **Automated Data Ingestion:** An admin endpoint populates the database with an artist's entire discography from a single request.
+* **Automated Data Ingestion:** A secure admin endpoint populates the database with an artist's entire discography from a single request.
 * **AI-Enhanced Content:** Leverages OpenAI (GPT-4o) to generate rich metadata not available from standard music APIs, including detailed album descriptions, moods, nuanced subgenres, and artist biographies.
 * **Persistent & Resilient Datastore:** Creates a self-contained database of music information, ensuring data longevity and independence from external API availability for all read operations.
 * **Contextual Popularity Scoring:** Implements a percentile-based scoring system for albums and artists, providing more meaningful popularity metrics within the context of the database's niche genre.
@@ -25,7 +58,7 @@ The primary goal of this application is to encourage music discovery. The API's 
 
 ## 🚀 Data Ingestion Pipeline
 
-The data ingestion process is triggered from a secure admin endpoint. It follows a multi-stage pipeline to gather, process, and store music data, ensuring each step enriches the data before it's saved to the database.
+The data ingestion process is triggered from a secure admin endpoint in the frontend application. It follows a multi-stage pipeline to gather, process, and store music data.
 
 ```mermaid
 graph TD
@@ -50,35 +83,35 @@ graph TD
 
 ## 🗄️ Database Schema & Design
 
-The database uses a relational schema designed with EF Core (code-first) and follows snake_case naming conventions. The design centers around creating a self-sufficient data store.
+The database uses a relational schema designed with EF Core (code-first) and follows snake_case naming conventions.
 
-| Table Name | Primary Purpose | Key Relationships |
-| :--- | :--- | :--- |
-| `albums` | Stores core album details from all data sources. | Many-to-Many with `artists` via `album_artists`. |
-| `artists` | Contains artist info, including AI-generated biography. | Many-to-Many with `albums` via `album_artists`. |
-| `disco_transactions` | Logs each data ingestion run for provenance. | One-to-Many with all created entities (`albums`, `artists`, etc.). |
-| `genre_types` | Lookup table for primary genres (e.g., Jazz, Blues). | One-to-Many with `subgenres`. |
-| `subgenres` | Lookup table for specific subgenres. | Many-to-One with `genre_types`. |
-| `moods` | Lookup table for moods with valence/arousal scores. | Many-to-Many with `albums` via `album_moods`. |
-| `jazz_era_types` | Lookup table for historical jazz eras. | Many-to-Many with `albums` via `album_jazz_eras`. |
-| `album_artists` | Junction table for the Album-Artist relationship. | Links `albums` and `artists`. |
-| `album_moods` | Junction table for the Album-Mood relationship. | Links `albums` and `moods`. |
-| `album_subgenres` | Junction table for the Album-Subgenre relationship. | Links `albums` and `subgenres`. |
+| Table Name           | Primary Purpose                                  | Key Relationships                                                  |
+| :------------------- | :----------------------------------------------- | :----------------------------------------------------------------- |
+| `albums`             | Stores core album details from all data sources. | Many-to-Many with `artists` via `album_artists`.                   |
+| `artists`            | Contains artist info, including AI-generated biography. | Many-to-Many with `albums` via `album_artists`.                   |
+| `disco_transactions` | Logs each data ingestion run for provenance.     | One-to-Many with all created entities (`albums`, `artists`, etc.). |
+| `genre_types`        | Lookup table for primary genres.                 | One-to-Many with `subgenres`.                                      |
+| `subgenres`          | Lookup table for specific subgenres.             | Many-to-One with `genre_types`.                                    |
+| `moods`              | Lookup table for moods with valence/arousal scores. | Many-to-Many with `albums` via `album_moods`.                     |
+| `jazz_era_types`     | Lookup table for historical jazz eras.           | Many-to-Many with `albums` via `album_jazz_eras`.                 |
+| `album_artists`      | Junction table for the Album-Artist relationship. | Links `albums` and `artists`.                                      |
+| `album_moods`        | Junction table for the Album-Mood relationship.  | Links `albums` and `moods`.                                       |
+| `album_subgenres`    | Junction table for the Album-Subgenre relationship. | Links `albums` and `subgenres`.                                    |
 
 ## 🔌 API Endpoints
 
-The API is organized into controllers for administration, data enrichment, and public consumption.
+The API is organized into controllers for administration, data enrichment, and public consumption by the Angular frontend.
 
-| Method | Endpoint | Description | Body / Parameters |
-| :--- | :--- | :--- | :--- |
-| **Admin** | | | |
-| `POST` | `/api/admin/create-discography` | Initiates the data pipeline for a given artist. | **Body**: `string` (e.g., `"John Coltrane"`) |
-| **Enrichment** | | | |
-| `POST` | `/api/enrichment/batchProcess` | Triggers normalization and calculation jobs on the DB. | *None* |
-| **Public** | | | |
-| `GET` | `/api/album/{Id}` | Retrieves a specific album by its database ID. | **Parameter**: `int Id` |
-| `GET` | `/api/album/random` | Retrieves a randomly selected album. | *None* |
-| `GET` | `/api/artist/get-artist` | Retrieves a specific artist by their database ID. | **Query**: `?artistId={id}` |
+| Method | Endpoint                       | Description                                          | Consumed By (Frontend)     |
+| :----- | :----------------------------- | :--------------------------------------------------- | :------------------------- |
+| **Admin** |                                |                                                      |                            |
+| `POST` | `/api/admin/create-discography`  | Initiates the data pipeline for a given artist.      | `AdminDashboardComponent`  |
+| **Enrichment** |                                |                                                      |                            |
+| `POST` | `/api/enrichment/batchProcess`   | Triggers normalization and calculation jobs on the DB. | (Admin/Internal Use)       |
+| **Public** |                                |                                                      |                            |
+| `GET`  | `/api/album/random`              | Retrieves a randomly selected album.                 | `HomeComponent`            |
+| `GET`  | `/api/album/{Id}`                | Retrieves a specific album by its database ID.       | `AlbumDetailComponent`     |
+| `GET`  | `/api/artist/get-artist`         | Retrieves a specific artist by their database ID.    | `ArtistDetailComponent`    |
 
 ## 💡 Technical Highlights
 
