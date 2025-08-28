@@ -1,101 +1,126 @@
-# Music Discovery API & Data Pipeline
+# 🎷 Jazz Music Discovery API & Data Pipeline
 
-## Project Summary
+This repository contains the backend API for a jazz music discovery application. Its primary function is to build and maintain a custom, enriched music database. By ingesting data from third-party sources like **Spotify** and **OpenAI (GPT-4o)** and storing it in a persistent **PostgreSQL** database, the application creates a resilient and independent datastore. This strategy ensures long-term stability and reduces reliance on external APIs for core read operations, using them only for adding new discographies.
 
-This project showcases an **ASP.NET Core Web API** designed for jazz music discovery. Its core function is to build and maintain a **custom, enriched music database**, reducing reliance on the long-term availability of third-party APIs. It features a **data ingestion pipeline** that integrates data from Spotify, enhances it using OpenAI (GPT-4o), retrieves streaming links via Song.link and stores the consolidated information in a PostgreSQL database managed by Entity Framework Core.
+## 🎯 Project Goal
 
-## Core Features & Capabilities
+The primary goal of this application is to encourage music discovery. The API's core function is to serve a random, enriched jazz album to a frontend application each day. This presents users with an opportunity to listen to something they might not be familiar with or wouldn't typically choose, broadening their musical horizons one album at a time.
 
-* **Automated Data Ingestion:** Populates the database with artist discographies via an admin endpoint.
-* **AI-Enhanced Content:** Leverages OpenAI (GPT-4o) to generate rich metadata (descriptions, themes, moods, subgenres, artist bios) beyond standard API offerings.
-* **Persistent & Resilient Datastore:** Creates an independent database of music information, ensuring data longevity.
-* **Relative Popularity Scoring:** Implements percentile-based scoring for albums and artists, offering context-aware popularity metrics.
+## ✨ Core Features
+
+* **Automated Data Ingestion:** An admin endpoint populates the database with an artist's entire discography from a single request.
+* **AI-Enhanced Content:** Leverages OpenAI (GPT-4o) to generate rich metadata not available from standard music APIs, including detailed album descriptions, moods, nuanced subgenres, and artist biographies.
+* **Persistent & Resilient Datastore:** Creates a self-contained database of music information, ensuring data longevity and independence from external API availability for all read operations.
+* **Contextual Popularity Scoring:** Implements a percentile-based scoring system for albums and artists, providing more meaningful popularity metrics within the context of the database's niche genre.
 * **Streaming Link Aggregation:** Fetches and stores unique identifiers for albums across multiple streaming platforms (Spotify, YouTube, Apple Music, etc.).
-* **RESTful API Access:** Provides endpoints to query detailed album and artist information from the custom database.
+* **RESTful API Access:** Exposes clean, documented endpoints for querying detailed album and artist information.
 
-## Technology Stack
+## 💻 Technology Stack
 
-* **Backend:** ASP.NET Core ([Specify .NET Version, e.g., 8.0]), C#
+* **Backend:** ASP.NET Core 8.0, C#
 * **Database:** PostgreSQL
 * **ORM:** Entity Framework Core (Code-First)
-* **APIs Integrated:** Spotify, OpenAI (GPT-4o), Song.link
+* **External APIs:** Spotify, OpenAI (GPT-4o), Song.link
 * **Key Libraries:** OpenAI SDK, Newtonsoft.Json, Serilog
 
-## Data Ingestion Pipeline
+## 🚀 Data Ingestion Pipeline
 
-This project implements a multi-stage pipeline to build the database:
+The data ingestion process is triggered from a secure admin endpoint. It follows a multi-stage pipeline to gather, process, and store music data, ensuring each step enriches the data before it's saved to the database.
 
-1.  **Spotify API:** Fetches initial album and artist details (metadata, popularity, Spotify IDs).
-2.  **OpenAI (GPT-4o):** Receives Spotify data; returns enriched information like detailed descriptions, inferred genres/subgenres/moods, themes, and artist biographies/instruments based on tailored prompts.
-3.  **Song.link API:** Uses Spotify Album IDs to retrieve unique identifiers for the album on various other streaming platforms.
-4.  **PostgreSQL Database:** Stores the combined, cleaned, and structured data from all sources, managed via EF Core.
+```mermaid
+graph TD
+    A[Admin Portal/Client] -- "1. POST /api/admin/create-discography <br> { artistName: 'Artist Name' }" --> B(AdminController);
+    B -- "2. Get Discography" --> C(SpotifyApiService);
+    C -- "3. Fetches all albums" --> D[Spotify API];
+    D -- "4. Raw Album List" --> C;
+    C -- "5. Batched Album List" --> E(GptApiService);
+    E -- "6. Enriches album data <br> (description, moods, genres)" --> F[OpenAI API];
+    F -- "7. Enriched Album Data" --> E;
+    E -- "8. Fully Processed DTOs" --> G(PopulateDbService);
+    G -- "9. For each new album, <br> get streaming links" --> H(StreamingLinksService);
+    H -- "10. Request with Spotify ID" --> I[Song.link API];
+    I -- "11. Platform IDs <br> (YouTube, Apple Music, etc.)" --> H;
+    H -- "12. Complete Album Data" --> G;
+    G -- "13. Persist Entities" --> J(MusicDbContext);
+    J -- "14. Save to DB" --> K[(PostgreSQL Database)];
 
-This pipeline orchestrates multiple external services, processes data transformations and loads results into a structured datastore reliably.
+    style A fill:#D5F5E3
+    style K fill:#D6EAF8
+```
 
-## Database Schema & Design
+## 🗄️ Database Schema & Design
 
-A relational PostgreSQL schema was designed using EF Core (code-first) with snake\_case naming conventions. The goal was to create a normalized and queryable structure for the aggregated music data.
+The database uses a relational schema designed with EF Core (code-first) and follows snake_case naming conventions. The design centers around creating a self-sufficient data store.
 
-**Key Tables:**
+| Table Name | Primary Purpose | Key Relationships |
+| :--- | :--- | :--- |
+| `albums` | Stores core album details from all data sources. | Many-to-Many with `artists` via `album_artists`. |
+| `artists` | Contains artist info, including AI-generated biography. | Many-to-Many with `albums` via `album_artists`. |
+| `disco_transactions` | Logs each data ingestion run for provenance. | One-to-Many with all created entities (`albums`, `artists`, etc.). |
+| `genre_types` | Lookup table for primary genres (e.g., Jazz, Blues). | One-to-Many with `subgenres`. |
+| `subgenres` | Lookup table for specific subgenres. | Many-to-One with `genre_types`. |
+| `moods` | Lookup table for moods with valence/arousal scores. | Many-to-Many with `albums` via `album_moods`. |
+| `jazz_era_types` | Lookup table for historical jazz eras. | Many-to-Many with `albums` via `album_jazz_eras`. |
+| `album_artists` | Junction table for the Album-Artist relationship. | Links `albums` and `artists`. |
+| `album_moods` | Junction table for the Album-Mood relationship. | Links `albums` and `moods`. |
+| `album_subgenres` | Junction table for the Album-Subgenre relationship. | Links `albums` and `subgenres`. |
 
-* `albums`: Core album details, including Spotify/GPT/SongLink fields.
-* `artists`: Artist details, including Spotify/GPT fields.
-* `genres`: Primary music genres (e.g., Jazz).
-* `subgenres`: Specific subgenres linked to a parent `Genre`.
-* `moods`: Descriptive moods associated with albums.
-* `disco_transactions`: Tracks each data ingestion run (e.g., processing one artist's discography).
-* `album_artists` (Junction): Many-to-Many between `albums` and `artists`.
-* `album_subgenres` (Junction): Many-to-Many between `albums` and `subgenres`.
-* `album_moods` (Junction): Many-to-Many between `albums` and `moods`.
+## 🔌 API Endpoints
 
-**Relationships & Data Integrity:**
+The API is organized into controllers for administration, data enrichment, and public consumption.
 
-* Standard one-to-many (e.g., `genres` to `albums`, `genres` to `subgenres`) and many-to-many relationships are established using junction tables.
-* Crucially, every entity created or modified during a specific data ingestion run (`albums`, `artists`, `genres`, etc., including junction table entries) holds a foreign key relationship to the `disco_transactions` table via a unique `disco_transaction_id` (GUID). This ensures **data provenance** and traceability for each batch operation.
+| Method | Endpoint | Description | Body / Parameters |
+| :--- | :--- | :--- | :--- |
+| **Admin** | | | |
+| `POST` | `/api/admin/create-discography` | Initiates the data pipeline for a given artist. | **Body**: `string` (e.g., `"John Coltrane"`) |
+| **Enrichment** | | | |
+| `POST` | `/api/enrichment/batchProcess` | Triggers normalization and calculation jobs on the DB. | *None* |
+| **Public** | | | |
+| `GET` | `/api/album/{Id}` | Retrieves a specific album by its database ID. | **Parameter**: `int Id` |
+| `GET` | `/api/album/random` | Retrieves a randomly selected album. | *None* |
+| `GET` | `/api/artist/get-artist` | Retrieves a specific artist by their database ID. | **Query**: `?artistId={id}` |
 
-## API Endpoints
+## 💡 Technical Highlights
 
-*(Note: Base URL typically `http://localhost:PORT` or `https://localhost:PORT`)*
+* **Data Provenance:** To ensure traceability, a `disco_transactions` table was implemented. Every record created during a single ingestion process shares the same unique `disco_transaction_id`. This design provides clear data lineage and simplifies potential rollbacks or analysis of specific data batches.
+* **Contextual Popularity Metric:** Spotify's absolute popularity scores can be skewed in a niche genre like jazz. To address this, an enrichment endpoint calculates a *percentile score* for each album and artist relative to all others in the database. This provides a more meaningful and context-aware popularity metric for the application.
+* **Efficient AI Interaction:** Album data is sent to the OpenAI API in batches of 20 to improve performance and handle large discographies without hitting rate limits. The prompts are carefully engineered to request compact JSON, minimizing token usage and simplifying deserialization.
 
-**Admin Endpoints (`/api/admin`)**
+## 🛠️ Local Setup & Installation
 
-* `POST /create-discography`: Initiates the data pipeline for a given artist name (passed as JSON string in body) to populate the database.
-* `POST /normalize-album-scores`: Calculates and updates percentile popularity scores for all albums in the database.
-* `POST /normalize-artist-scores`: Calculates and updates percentile popularity scores for all artists in the database.
-* `POST /test?spotifyAlbumId={id}`: (Test Utility) Fetches streaming links for a specific Spotify album ID via Song.link.
+1.  **Prerequisites:**
+    * [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+    * [PostgreSQL](https://www.postgresql.org/download/)
+    * [Git](https://git-scm.com/downloads)
 
-**Public Endpoints (`/api/album`, `/api/artist`)**
-
-* `GET /album/{Id}`: Retrieves detailed information for a specific album by its database ID.
-* `GET /album/random`: Retrieves detailed information for a randomly selected album.
-* `GET /artist/get-artist?artistId={id}`: Retrieves detailed artist information (including notable albums) by database ID.
-
-## Technical Highlights & Problem Solving
-
-* **Data Provenance and Management:** To manage data ingested in batches (e.g., one artist's discography), a `disco_transactions` table was implemented. Every record created across multiple tables during a single operation shares a unique GUID (`disco_transaction_id`). This design provides clear data lineage and simplifies potential future operations like targeted data analysis or rollback per transaction.
-* **Contextual Popularity Metric:** Recognizing that Spotify's absolute popularity scores can be misleading for niche genres (e.g., Jazz albums compared to mainstream pop), an endpoint (`POST /api/admin/normalize-album-scores`) was created. This calculates and stores a *percentile score* for each album, reflecting its popularity *relative* to other albums within the database. This provides a more meaningful comparative metric within the application's specific domain.
-
-## Setup & Usage
-
-1.  **Prerequisites:** .NET SDK, PostgreSQL, Git.
-2.  **Clone:** `git clone [your-repository-url]`
-3.  **Configure:** Set API Keys (OpenAI, Spotify) and PostgreSQL connection string using .NET User Secrets:
+2.  **Clone the Repository:**
     ```bash
-    cd [project-directory]
-    dotnet user-secrets init
-    dotnet user-secrets set "openai" "YOUR_KEY"
-    dotnet user-secrets set "spotifyClientId" "YOUR_ID"
-    dotnet user-secrets set "spotifyClientSecret" "YOUR_SECRET"
-    dotnet user-secrets set "ConnectionStrings:DefaultConnection" "YOUR_DB_CONNECTION_STRING"
+    git clone <your-repository-url>
+    cd api-dotnet-random-jazz-album/Api
     ```
-4.  **Database:** Ensure PostgreSQL server is running. Apply EF Core migrations:
+
+3.  **Configure User Secrets:**
+    This project uses .NET User Secrets to store sensitive information.
+    * **Initialize user secrets:**
+        ```bash
+        dotnet user-secrets init
+        ```
+    * **Set your secrets:**
+        ```bash
+        dotnet user-secrets set "openai" "YOUR_OPENAI_API_KEY"
+        dotnet user-secrets set "spotifyClientId" "YOUR_SPOTIFY_CLIENT_ID"
+        dotnet user-secrets set "spotifyClientSecret" "YOUR_SPOTIFY_CLIENT_SECRET"
+        dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=RandomAlbum;Username=postgres;Password=YOUR_PASSWORD"
+        ```
+
+4.  **Apply Database Migrations:**
+    Ensure your PostgreSQL server is running. Then, use the Entity Framework Core CLI to create the database and apply the schema.
     ```bash
     dotnet ef database update
     ```
-5.  **Run:**
+
+5.  **Run the Application:**
     ```bash
     dotnet run
     ```
-    The API will start, listening on specified ports (see console output).
-
----
+    The API will start, and you can access the Swagger UI for testing at `http://localhost:5148/swagger` (the port may vary; check your console output).
