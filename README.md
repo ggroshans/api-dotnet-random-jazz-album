@@ -1,6 +1,6 @@
 # 🎷 Jazz Music Discovery API & Data Pipeline
 
-This repository contains the backend API for a full-stack jazz music discovery application. The frontend, an Angular application, is in a separate repository [here](https://github.com/ggroshans/fe-angular-random-jazz-album).
+This repository contains the backend API for a full-stack jazz music discovery application. The frontend, an Angular application, is in a separate repository [fe-angular-random-jazz-album](https://github.com/ggroshans/fe-angular-random-jazz-album).
 
 This API's primary function is to build and maintain a custom, enriched music database. By ingesting data from third-party sources like **Spotify** and **OpenAI (GPT-4o)** and storing it in a persistent **PostgreSQL** database, the application creates a resilient and independent datastore. This strategy ensures long-term stability and reduces reliance on external APIs for core read operations, using them only for adding new discographies.
 
