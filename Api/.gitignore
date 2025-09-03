@@ -5,6 +5,10 @@ project.lock.json
 *.pyc
 nupkg/
 
+# Sqlite
+*.db-wal
+*.db-shm
+
 # Visual Studio Code
 .vscode/
 

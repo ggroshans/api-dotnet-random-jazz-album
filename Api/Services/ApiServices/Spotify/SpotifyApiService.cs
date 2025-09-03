@@ -26,7 +26,7 @@ namespace Api.Services.ApiServices.Spotify
             _configuration = configuration;
             _logger = logger;
 
-            _spotifyClientId = _configuration["spotifyClientId"];
+            _spotifyClientId = "690c1783af684f60a31d0bef9ecc898e";
             _spotifyClientSecret = _configuration["spotifyClientSecret"];
         }
 

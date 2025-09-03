@@ -22,15 +22,12 @@ namespace RandomAlbumApi
 
             builder.Host.UseSerilog();
             builder.Services.AddSingleton(Log.Logger);
-
-            Log.Logger.Information("Test");
-
-            // Add services to the container.
-
             builder.Services.AddDbContext<MusicDbContext>(options =>
-                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+                options
+                    .UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
+                    .UseSnakeCaseNamingConvention());
+
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddCors(options =>
@@ -49,8 +46,17 @@ namespace RandomAlbumApi
             builder.Services.AddScoped<ISpotifyClient, SpotifyClient>();
             builder.Services.AddScoped<StreamingLinksService>();
             builder.Services.AddScoped<PopulateDbService>();
-  
+
+            var allowAny = "_allowAny";
+                builder.Services.AddCors(o =>
+                {
+                    o.AddPolicy(allowAny, b =>
+                        b.WithOrigins("https://frontend.vercel.app", "http://localhost:4200")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod());
+                });
             var app = builder.Build();
+            app.UseCors(allowAny);
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -60,6 +66,12 @@ namespace RandomAlbumApi
             }
 
             //app.UseHttpsRedirection();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<MusicDbContext>();
+                db.Database.Migrate(); 
+            }
 
             app.UseCors();
 

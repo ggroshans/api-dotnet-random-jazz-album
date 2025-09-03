@@ -105,7 +105,7 @@ namespace Api.Services
 
                     // ------- Genres -------
                     foreach (var genreDto in albumDto.Genres)
-                    {
+                    {               
                         var matchingGenre = _db.GenreTypes.FirstOrDefault(gt => gt.Name == genreDto.Name);
 
                         // ------- Subgenres -------
