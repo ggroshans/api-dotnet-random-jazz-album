@@ -23,9 +23,21 @@ namespace RandomAlbumApi
             builder.Host.UseSerilog();
             builder.Services.AddSingleton(Log.Logger);
             builder.Services.AddDbContext<MusicDbContext>(options =>
-                options
-                    .UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
-                    .UseSnakeCaseNamingConvention());
+            {
+                if (builder.Environment.IsDevelopment())
+                {
+                    options.UseSqlite("Data Source=jazz.db")
+                    .UseSnakeCaseNamingConvention();
+                }
+                else
+                {
+                    options.UseSqlite("Data Source=/data/jazz.db")
+                    .UseSnakeCaseNamingConvention();
+                }
+                // options
+                //     .UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
+                    // .UseSnakeCaseNamingConvention();
+            });
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
@@ -51,7 +63,7 @@ namespace RandomAlbumApi
                 builder.Services.AddCors(o =>
                 {
                     o.AddPolicy(allowAny, b =>
-                        b.WithOrigins("https://frontend.vercel.app", "http://localhost:4200")
+                        b.WithOrigins("https://www.jazzoftheday.com", "jazzoftheday.com", "http://localhost:4200")
                         .AllowAnyHeader()
                         .AllowAnyMethod());
                 });
@@ -77,8 +89,10 @@ namespace RandomAlbumApi
 
             app.UseAuthorization();
 
-
             app.MapControllers();
+
+            app.MapGet("/", () => Results.Ok(new { status = "ok" }));
+            app.MapGet("/health", () => "healthy");
 
             app.Run();
         }

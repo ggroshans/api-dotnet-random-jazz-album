@@ -48,6 +48,7 @@ namespace Api.Migrations
                     id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     name = table.Column<string>(type: "TEXT", nullable: false),
+                    description = table.Column<string>(type: "TEXT", nullable: false),
                     start_year = table.Column<int>(type: "INTEGER", nullable: true),
                     end_year = table.Column<int>(type: "INTEGER", nullable: true)
                 },
@@ -355,28 +356,28 @@ namespace Api.Migrations
 
             migrationBuilder.InsertData(
                 table: "jazz_era_types",
-                columns: new[] { "id", "end_year", "name", "start_year" },
+                columns: new[] { "id", "description", "end_year", "name", "start_year" },
                 values: new object[,]
                 {
-                    { 1, 1918, "Ragtime", 1897 },
-                    { 2, 1929, "Early Jazz / New Orleans Jazz", 1910 },
-                    { 3, 1942, "Kansas City Jazz", 1928 },
-                    { 4, 1945, "Swing Era / Big Band Era", 1930 },
-                    { 5, 1953, "Gypsy Jazz (Jazz Manouche)", 1934 },
-                    { 6, 1955, "Bebop", 1945 },
-                    { 7, 1959, "Cool Jazz", 1949 },
-                    { 8, 1965, "Hard Bop", 1954 },
-                    { 9, 1969, "Soul Jazz", 1958 },
-                    { 10, 1967, "Modal Jazz", 1958 },
-                    { 11, 1974, "Free Jazz / Avant-Garde", 1960 },
-                    { 12, 1972, "Post-Bop", 1964 },
-                    { 13, 1989, "Jazz Fusion", 1969 },
-                    { 14, 1982, "Jazz-Funk", 1972 },
-                    { 15, null, "Latin Jazz (Afro-Cuban & Brazilian)", 1947 },
-                    { 16, 1999, "Neo-Bop", 1980 },
-                    { 17, 1999, "Smooth Jazz", 1982 },
-                    { 18, 1997, "Acid Jazz", 1987 },
-                    { 19, null, "Contemporary Jazz / Modern Creative", 2000 }
+                    { 1, "Ragtime was a syncopated piano-based style that blended African American rhythms with European classical traditions. Popularized by Scott Joplin, it laid the rhythmic foundation for early jazz and dance music of the early 20th century.", 1918, "Ragtime", 1897 },
+                    { 2, "Emerging in New Orleans, this style fused blues, brass band marches, and ragtime. Characterized by collective improvisation and polyphony, it spread through musicians like Louis Armstrong and Jelly Roll Morton, shaping the first true jazz idiom.", 1929, "Early Jazz / New Orleans Jazz", 1910 },
+                    { 3, "Known for riff-based arrangements, blues roots, and an emphasis on improvisation, Kansas City Jazz fostered a looser swing feel and extended jam sessions. Count Basie’s orchestra became the emblem of this vibrant, nightlife-driven regional style.", 1942, "Kansas City Jazz", 1928 },
+                    { 4, "The Swing Era brought jazz into mainstream popularity with large ensembles, danceable rhythms, and sophisticated arrangements. Leaders like Duke Ellington, Count Basie, and Benny Goodman defined this golden age of jazz and American dance culture.", 1945, "Swing Era / Big Band Era", 1930 },
+                    { 5, "Pioneered by guitarist Django Reinhardt and violinist Stéphane Grappelli, Gypsy Jazz combined swing rhythms with Romani folk traditions. Driven by guitar and violin, it created a distinct European jazz sound still celebrated in manouche circles today.", 1953, "Gypsy Jazz (Jazz Manouche)", 1934 },
+                    { 6, "Bebop shifted jazz from dance halls to art music, emphasizing speed, harmonic complexity, and virtuosic improvisation. Innovators like Charlie Parker and Dizzy Gillespie forged small-combo jazz that challenged listeners and redefined modern musicianship.", 1955, "Bebop", 1945 },
+                    { 7, "Cool Jazz contrasted bebop with a more subdued, lyrical sound, incorporating classical influences and rich textures. Figures like Miles Davis, Dave Brubeck, and Gerry Mulligan popularized its relaxed mood, particularly on the U.S. West Coast.", 1959, "Cool Jazz", 1949 },
+                    { 8, "Hard Bop revitalized jazz by infusing blues, gospel, and R&B elements into the bebop tradition. With powerful rhythms, soulful phrasing, and a return to roots, musicians like Art Blakey and Horace Silver created a deeply expressive and urban sound.", 1965, "Hard Bop", 1954 },
+                    { 9, "Emerging from hard bop, Soul Jazz highlighted groove, bluesy melodies, and gospel-inspired harmonies. Often driven by the Hammond organ, it fused jazz improvisation with R&B and funk rhythms, making the style accessible to broader popular audiences.", 1969, "Soul Jazz", 1958 },
+                    { 10, "Modal Jazz broke from chord-heavy bebop by using musical modes as the harmonic basis, enabling freer improvisation. Pioneered by Miles Davis on 'Kind of Blue' and expanded by John Coltrane, this era profoundly influenced modern improvisational practice.", 1967, "Modal Jazz", 1958 },
+                    { 11, "Free Jazz rejected fixed forms and harmony, focusing on collective improvisation, extended techniques, and raw expression. Artists like Ornette Coleman, Cecil Taylor, and John Coltrane expanded jazz into avant-garde territory, reshaping its boundaries.", 1974, "Free Jazz / Avant-Garde", 1960 },
+                    { 12, "Post-Bop synthesized elements of hard bop, modal jazz, and avant-garde experimentation. Characterized by harmonic freedom and sophisticated composition, it was championed by artists like Wayne Shorter, Herbie Hancock, and Miles Davis’s mid-60s quintet.", 1972, "Post-Bop", 1964 },
+                    { 13, "Jazz Fusion merged improvisation with rock, funk, and electronic instruments. Bands like Weather Report and Mahavishnu Orchestra blended amplified sounds and global influences, creating one of jazz’s most commercially and stylistically diverse movements.", 1989, "Jazz Fusion", 1969 },
+                    { 14, "Jazz-Funk emphasized syncopated bass lines, groove-heavy rhythms, and electric instrumentation. Combining jazz harmonies with funk danceability, it flourished in the 1970s through artists like Herbie Hancock and Roy Ayers, shaping later popular music.", 1982, "Jazz-Funk", 1972 },
+                    { 15, "Latin Jazz integrates jazz improvisation with Afro-Cuban rhythms like clave and Brazilian styles such as bossa nova. Popularized by Dizzy Gillespie, Tito Puente, and Antonio Carlos Jobim, it remains one of jazz’s most enduring and global traditions.", null, "Latin Jazz (Afro-Cuban & Brazilian)", 1947 },
+                    { 16, "Neo-Bop revived the acoustic, hard bop sound with modern sensibilities during the 1980s and 90s. Spearheaded by Wynton Marsalis and the 'Young Lions,' it reaffirmed traditional improvisation and swing while resisting the era’s more commercial trends.", 1999, "Neo-Bop", 1980 },
+                    { 17, "Smooth Jazz blended jazz improvisation with pop and R&B sensibilities, producing a polished, radio-friendly sound. Artists like Kenny G, George Benson, and David Sanborn popularized the genre, making it commercially successful but critically divisive.", 1999, "Smooth Jazz", 1982 },
+                    { 18, "Acid Jazz fused jazz improvisation with funk, soul, hip-hop, and electronic dance grooves. Emerging from UK club culture, it produced artists like Jamiroquai and Brand New Heavies, influencing both the jazz revival and 1990s popular music landscapes.", 1997, "Acid Jazz", 1987 },
+                    { 19, "Contemporary Jazz reflects today’s global, cross-genre landscape, blending acoustic traditions with electronics, world music, and experimental approaches. It spans mainstream and avant-garde, highlighting jazz’s ongoing innovation in the 21st century.", null, "Contemporary Jazz / Modern Creative", 2000 }
                 });
 
             migrationBuilder.CreateIndex(
