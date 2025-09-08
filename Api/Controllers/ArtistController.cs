@@ -5,6 +5,7 @@ using Api.Services.ApiServices.Spotify;
 using Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Api.Models.DTOs.ResponseDTOs;
+using Api.Services.Contracts;
 
 namespace Api.Controllers
 {
@@ -14,12 +15,12 @@ namespace Api.Controllers
     {
         
         private readonly Serilog.ILogger _logger;
-        private readonly SpotifyApiService _spotifyApiService;
-        private readonly GptApiService _openAIservice;
-        private readonly PopulateDbService _populateDbService;
+        private readonly ISpotifyApiService _spotifyApiService;
+        private readonly IGptApiService _openAIservice;
+        private readonly IPopulateDbService _populateDbService;
         private readonly MusicDbContext _dbContext;
 
-        public ArtistController(Serilog.ILogger logger, GptApiService openAIService, SpotifyApiService spotifyApiService, PopulateDbService populateDbService, MusicDbContext dbContext)
+        public ArtistController(Serilog.ILogger logger, IGptApiService openAIService, ISpotifyApiService spotifyApiService, IPopulateDbService populateDbService, MusicDbContext dbContext)
         {
             _logger = logger;
             _openAIservice = openAIService;
@@ -29,7 +30,7 @@ namespace Api.Controllers
         }
 
         [HttpGet("get-artist")]
-        public async Task<IActionResult> getArtist(int artistId)
+        public async Task<IActionResult> GetArtist(int artistId)
         {
             var artistEntity =  await _dbContext.Artists.FirstOrDefaultAsync(a => a.Id == artistId);
             var artistAlbums = await _dbContext.AlbumArtists.Where(aa => aa.ArtistId == artistEntity.Id).Select(a => a.Album).Distinct().ToListAsync();
