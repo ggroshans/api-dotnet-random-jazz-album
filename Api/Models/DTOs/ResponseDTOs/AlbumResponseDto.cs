@@ -22,7 +22,7 @@ namespace Api.Models.DTOs.ResponseDTOs
         public string? AppleMusicId { get; set; }
         public string? AmazonMusicId { get; set; }
         public string? PandoraId { get; set; }
-        public List<string> JazzEras { get; set; }
+        public List<JazzEraResponseDto> JazzEras { get; set; }
         public List<ArtistResponseDto> Artists { get; set; }
         public List<string> Genres { get; set; }
         public List<string> Subgenres { get; set; }

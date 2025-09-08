@@ -6,17 +6,18 @@ using Api.Domain.Entities;
 using Api.Utilities;
 using Newtonsoft.Json;
 using Api.Models.DTOs.InternalDTOs;
+using Api.Services.Contracts;
 
 namespace Api.Services
 {
     public class PopulateDbService
     {
         private readonly MusicDbContext _db;
-        private readonly SpotifyApiService _spotifyApiService;
-        private readonly GptApiService _gptApiService;
-        private readonly StreamingLinksService _streamingLinksService;
+        private readonly ISpotifyApiService _spotifyApiService;
+        private readonly IGptApiService _gptApiService;
+        private readonly IStreamingLinksService _streamingLinksService;
 
-        public PopulateDbService(MusicDbContext db, SpotifyApiService spotifyApiService, GptApiService gptApiService, StreamingLinksService streamingLinksService )
+        public PopulateDbService(MusicDbContext db, ISpotifyApiService spotifyApiService, IGptApiService gptApiService, IStreamingLinksService streamingLinksService )
         {
             _db = db;
             _spotifyApiService = spotifyApiService;
@@ -40,7 +41,7 @@ namespace Api.Services
 
                 if (existingAlbum == null)
                 {
-                    var streamingLinks = await _streamingLinksService.GetLinks(albumDto.SpotifyId);
+                    var streamingLinks = await _streamingLinksService.GetLinksForAlbumAsync(albumDto.SpotifyId);
 
                     requestDetails.NewAlbumCount += 1;
                     existingAlbum = new Album

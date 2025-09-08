@@ -6,7 +6,7 @@ namespace Api.Services.ApiServices
     public class StreamingLinksService
     {
         public StreamingLinksService(){}
-        public async Task<Dictionary<string,string>> GetLinks(string spotifyAlbumId)
+        public async Task<Dictionary<string,string>> GetLinksForAlbumAsync(string spotifyAlbumId)
         {
             using var _httpClient = new HttpClient();
             var url = $"https://open.spotify.com/album/{spotifyAlbumId}";
